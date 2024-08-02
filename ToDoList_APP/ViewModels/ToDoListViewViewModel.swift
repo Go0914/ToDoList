@@ -1,18 +1,25 @@
 import FirebaseFirestore
 import Foundation
 
+// ToDoリストのビューモデルクラス
 class ToDoListViewViewModel: ObservableObject {
+    // 新しいアイテムを追加するビューを表示するかどうかのフラグ
     @Published var showingNewItemView = false
+    // ToDoリストのアイテム配列
     @Published var items: [ToDoListItem] = []
     
+    // ユーザーID
     private var userId: String
+    // Firestoreのリアルタイムリスナー
     private var listenerRegistration: ListenerRegistration?
     
+    // イニシャライザ
     init(userId: String) {
         self.userId = userId
         setupRealtimeUpdates()
     }
     
+    // アイテムを削除する関数
     func delete(id: String) {
         let db = Firestore.firestore()
         
@@ -25,11 +32,13 @@ class ToDoListViewViewModel: ObservableObject {
                     print("Error removing document: \(error)")
                 } else {
                     print("Document successfully removed!")
+                    // ローカルの配列からも削除
                     self.items.removeAll { $0.id == id }
                 }
             }
     }
     
+    // Firestoreのリアルタイム更新をセットアップする関数
     func setupRealtimeUpdates() {
         print("Setting up realtime updates for user: \(userId)")
         let db = Firestore.firestore()
@@ -43,6 +52,7 @@ class ToDoListViewViewModel: ObservableObject {
                     return
                 }
                 
+                // ドキュメントをToDoListItemオブジェクトに変換
                 self.items = querySnapshot?.documents.compactMap { document in
                     do {
                         let item = try document.data(as: ToDoListItem.self)
@@ -50,7 +60,7 @@ class ToDoListViewViewModel: ObservableObject {
                         return item
                     } catch {
                         print("Error parsing document \(document.documentID): \(error)")
-                        // Attempt to create a ToDoListItem with available data
+                        // パースに失敗した場合、利用可能なデータでToDoListItemを作成
                         if let title = document.data()["title"] as? String,
                            let dueDate = document.data()["dueDate"] as? TimeInterval,
                            let createdDate = document.data()["createdDate"] as? TimeInterval {
@@ -70,6 +80,7 @@ class ToDoListViewViewModel: ObservableObject {
             }
     }
     
+    // 新しいアイテムを追加する関数
     func addItem(_ item: ToDoListItem) {
         print("Adding item: \(item)")
         let db = Firestore.firestore()
@@ -86,6 +97,7 @@ class ToDoListViewViewModel: ObservableObject {
         }
     }
     
+    // デイニシャライザ：リスナーを解除
     deinit {
         listenerRegistration?.remove()
     }
@@ -93,6 +105,7 @@ class ToDoListViewViewModel: ObservableObject {
 
 // プレビュー用の拡張
 extension ToDoListViewViewModel {
+    // プレビュー用のダミーデータを持つビューモデルを生成
     static var preview: ToDoListViewViewModel {
         let viewModel = ToDoListViewViewModel(userId: "HKdvXLQ7WhY1qQaEhmOT8gXnWH93")
         viewModel.items = [

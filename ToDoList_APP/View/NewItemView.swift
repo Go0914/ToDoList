@@ -1,9 +1,12 @@
 import SwiftUI
 
 struct NewItemView: View {
+    // ビューモデルの初期化
     @StateObject var viewModel: NewItemViewViewModel
+    // 新規アイテム追加ビューの表示状態を管理するバインディング
     @Binding var newItemPresented: Bool
     
+    // イニシャライザ：新規アイテム追加ビューの表示状態とToDoリストのビューモデルを受け取る
     init(newItemPresented: Binding<Bool>, toDoListViewModel: ToDoListViewViewModel) {
         self._newItemPresented = newItemPresented
         self._viewModel = StateObject(wrappedValue: NewItemViewViewModel(toDoListViewModel: toDoListViewModel))
@@ -11,21 +14,22 @@ struct NewItemView: View {
     
     var body: some View {
         VStack {
+            // タイトル
             Text("New Item")
                 .font(.system(size: 32))
                 .bold()
                 .padding(.top, 100)
             
             Form {
-                // title
+                // タイトル入力フィールド
                 TextField("Title", text: $viewModel.title)
                     .textFieldStyle(DefaultTextFieldStyle())
                 
-                // Due Date
+                // 期日選択
                 DatePicker("Due Date", selection: $viewModel.dueDate)
                     .datePickerStyle(GraphicalDatePickerStyle())
                 
-                // 予測時間フィールドを追加
+                // 予測時間選択
                 Picker("Estimated Time", selection: $viewModel.estimatedTimeIndex) {
                     Text("15分").tag(0)
                     Text("30分").tag(1)
@@ -36,7 +40,7 @@ struct NewItemView: View {
                     Text("3時間").tag(6)
                 }
                 
-                // Button
+                // 保存ボタン
                 TLButton(
                     title: "Save",
                     backgroud: .pink
@@ -50,6 +54,7 @@ struct NewItemView: View {
                 }
                 .padding()
             }
+            // エラーアラート
             .alert(isPresented: $viewModel.showAlert) {
                 Alert(
                     title: Text("Error"),
@@ -60,6 +65,7 @@ struct NewItemView: View {
     }
 }
 
+// プレビュー用の設定
 #Preview {
     NewItemView(
         newItemPresented: .constant(true),

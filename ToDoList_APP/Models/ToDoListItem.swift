@@ -1,17 +1,19 @@
 import Foundation
 
+// ToDoリストの各項目を表現する構造体
 struct ToDoListItem: Codable, Identifiable {
-    let id: String
-    let title: String
-    let dueDate: TimeInterval
-    let createdDate: TimeInterval
-    var isDone: Bool
-    let estimatedTime: Double?
-    var progress: Double
-    var lastUpdated: Date
-    var actualTime: TimeInterval?  // Changed to optional
-    var elapsedTime: TimeInterval?
+    let id: String            // 項目の一意識別子
+    let title: String         // 項目のタイトル
+    let dueDate: TimeInterval // 期限（UNIX時間）
+    let createdDate: TimeInterval // 作成日時（UNIX時間）
+    var isDone: Bool          // 完了状態
+    let estimatedTime: Double? // 見積もり時間（オプショナル）
+    var progress: Double      // 進捗状況（0.0 〜 1.0）
+    var lastUpdated: Date     // 最終更新日時
+    var actualTime: TimeInterval?  // 実際にかかった時間（オプショナル）
+    var elapsedTime: TimeInterval? // 経過時間（オプショナル）
     
+    // イニシャライザ
     init(id: String, title: String, dueDate: TimeInterval, createdDate: TimeInterval, isDone: Bool, estimatedTime: Double? = nil, progress: Double = 0.0, lastUpdated: Date = Date(), actualTime: TimeInterval? = nil, elapsedTime: TimeInterval? = nil) {
         self.id = id
         self.title = title
@@ -25,6 +27,7 @@ struct ToDoListItem: Codable, Identifiable {
         self.elapsedTime = elapsedTime
     }
     
+    // 構造体をディクショナリに変換するメソッド
     func asDictionary() -> [String: Any] {
         return [
             "id": id,
@@ -32,9 +35,10 @@ struct ToDoListItem: Codable, Identifiable {
             "dueDate": dueDate,
             "createdDate": createdDate,
             "isDone": isDone,
-            "estimatedTime": estimatedTime as Any,
+            "estimatedTime": estimatedTime as Any, // オプショナル値をAnyにキャスト
             "progress": progress,
             "lastUpdated": lastUpdated
+            // 注意: actualTimeとelapsedTimeはディクショナリに含まれていません
         ]
     }
 }
