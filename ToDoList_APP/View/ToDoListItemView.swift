@@ -23,7 +23,7 @@ struct ToDoListItemView: View {
                     }
                 
                 VStack {
-                    TaskCompletionView(item: convertToPreviewItem(item))
+                    TaskCompletionView(item: item)
                         .transition(.scale)
                         .zIndex(1)
                     
@@ -142,14 +142,6 @@ struct ToDoListItemView: View {
         }
         return "\(hours)h\(minutes)min"
     }
-    
-    func convertToPreviewItem(_ item: ToDoListItem) -> PreviewToDoListItem {
-        return PreviewToDoListItem(
-            title: item.title,
-            estimatedTime: item.estimatedTime ?? 0,
-            elapsedTime: item.elapsedTime ?? 0
-        )
-    }
 }
 
 struct ToDoListItemView_Previews: PreviewProvider {
@@ -160,7 +152,9 @@ struct ToDoListItemView_Previews: PreviewProvider {
             dueDate: Date().timeIntervalSince1970,
             createdDate: Date().timeIntervalSince1970,
             isDone: false,
-            estimatedTime: 2.5
+            estimatedTime: 2.5,
+            progress: 0.5,
+            lastUpdated: Date()
         ))
     }
 }
