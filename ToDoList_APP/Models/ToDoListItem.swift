@@ -11,10 +11,10 @@ struct ToDoListItem: Codable, Identifiable {
     var progress: Double      // 進捗状況（0.0 〜 1.0）
     var lastUpdated: Date     // 最終更新日時
     var actualTime: TimeInterval?  // 実際にかかった時間（オプショナル）
-    var elapsedTime: TimeInterval? // 経過時間（オプショナル）
+    var elapsedTime: Double // 経過時間
     
     // イニシャライザ
-    init(id: String, title: String, dueDate: TimeInterval, createdDate: TimeInterval, isDone: Bool, estimatedTime: Double? = nil, progress: Double = 0.0, lastUpdated: Date = Date(), actualTime: TimeInterval? = nil, elapsedTime: TimeInterval? = nil) {
+    init(id: String, title: String, dueDate: TimeInterval, createdDate: TimeInterval, isDone: Bool, estimatedTime: Double? = nil, progress: Double = 0.0, lastUpdated: Date = Date(), actualTime: TimeInterval? = nil, elapsedTime: Double = 0.0) {
         self.id = id
         self.title = title
         self.dueDate = dueDate

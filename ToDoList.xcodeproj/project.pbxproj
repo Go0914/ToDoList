@@ -10,9 +10,6 @@
 		9779AF082C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9779AF072C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift */; };
 		9779AF092C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9779AF072C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift */; };
 		9779AF0A2C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9779AF072C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift */; };
-		97D8FF9C2C57A35B0058E637 /* StopwatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D8FF9B2C57A35B0058E637 /* StopwatchViewModel.swift */; };
-		97D8FF9D2C57A35B0058E637 /* StopwatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D8FF9B2C57A35B0058E637 /* StopwatchViewModel.swift */; };
-		97D8FF9E2C57A35B0058E637 /* StopwatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D8FF9B2C57A35B0058E637 /* StopwatchViewModel.swift */; };
 		97E0478E2C5742E0002932BE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97E047722C5742E0002932BE /* Assets.xcassets */; };
 		97E0478F2C5742E0002932BE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97E047782C5742E0002932BE /* Preview Assets.xcassets */; };
 		97E047912C5742E0002932BE /* RegisterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97E047892C5742E0002932BE /* RegisterViewModel.swift */; };
@@ -135,7 +132,6 @@
 
 /* Begin PBXFileReference section */
 		9779AF072C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressiveRingTimerViewModel.swift; sourceTree = "<group>"; };
-		97D8FF9B2C57A35B0058E637 /* StopwatchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopwatchViewModel.swift; sourceTree = "<group>"; };
 		97E046D02C574297002932BE /* ToDoList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		97E0476E2C5742E0002932BE /* ToDoListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListItem.swift; sourceTree = "<group>"; };
 		97E0476F2C5742E0002932BE /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -293,7 +289,6 @@
 				97E047892C5742E0002932BE /* RegisterViewModel.swift */,
 				97E0478A2C5742E0002932BE /* ToDoListItemViewViewModel.swift */,
 				97E0478B2C5742E0002932BE /* ToDoListViewViewModel.swift */,
-				97D8FF9B2C57A35B0058E637 /* StopwatchViewModel.swift */,
 				9779AF072C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift */,
 			);
 			path = ViewModels;
@@ -496,7 +491,6 @@
 				97E047B42C5742E0002932BE /* MainViewViewModel.swift in Sources */,
 				97E047B52C5742E0002932BE /* LoginViewViewModel.swift in Sources */,
 				97E047B62C5742E0002932BE /* ToDoList_App.swift in Sources */,
-				97D8FF9D2C57A35B0058E637 /* StopwatchViewModel.swift in Sources */,
 				97E047B72C5742E0002932BE /* HeaderView.swift in Sources */,
 				97E047B82C5742E0002932BE /* ToDoListItem.swift in Sources */,
 				97E047B92C5742E0002932BE /* RegisterView.swift in Sources */,
@@ -527,7 +521,6 @@
 				97E047CB2C5742E0002932BE /* MainViewViewModel.swift in Sources */,
 				97E047CC2C5742E0002932BE /* LoginViewViewModel.swift in Sources */,
 				97E047CD2C5742E0002932BE /* ToDoList_App.swift in Sources */,
-				97D8FF9C2C57A35B0058E637 /* StopwatchViewModel.swift in Sources */,
 				97E047CE2C5742E0002932BE /* HeaderView.swift in Sources */,
 				97E047CF2C5742E0002932BE /* ToDoListItem.swift in Sources */,
 				97E047D02C5742E0002932BE /* RegisterView.swift in Sources */,
@@ -558,7 +551,6 @@
 				97E0479A2C5742E0002932BE /* MainViewViewModel.swift in Sources */,
 				97E0479B2C5742E0002932BE /* LoginViewViewModel.swift in Sources */,
 				97E0479C2C5742E0002932BE /* ToDoList_App.swift in Sources */,
-				97D8FF9E2C57A35B0058E637 /* StopwatchViewModel.swift in Sources */,
 				97E0479D2C5742E0002932BE /* HeaderView.swift in Sources */,
 				97E0479E2C5742E0002932BE /* ToDoListItem.swift in Sources */,
 				97E0479F2C5742E0002932BE /* RegisterView.swift in Sources */,
