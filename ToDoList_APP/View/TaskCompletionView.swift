@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct TaskCompletionView: View {
-    let item: ToDoListItem
+    @State var item: ToDoListItem
     
     // デバッグ用にログを出力
     init(item: ToDoListItem) {
-        self.item = item
+        self._item = State(initialValue: item)
         print("TaskCompletionView initialized with item: \(item)")
     }
     
@@ -55,7 +55,7 @@ struct TaskCompletionView: View {
     private var timeComparisonView: some View {
         HStack {
             timeCard(title: "予測時間", time: item.estimatedTime ?? 0)
-            timeCard(title: "実際の時間", time: item.elapsedTime ?? 0)
+            timeCard(title: "実際の時間", time: item.elapsedTime)
         }
     }
     
@@ -75,9 +75,9 @@ struct TaskCompletionView: View {
     
     private var keyMetricsView: some View {
         HStack(spacing: 15) {
-            metricView(title: "予測精度", value: predictionAccuracy, format: "%.1f%%", color: .blue)
-            metricView(title: "効率指数", value: efficiencyIndex, format: "%.2f", color: .orange)
-            metricView(title: "時間節約", value: timeSavingAchievement, format: "%.1f%%", color: .green)
+            metricView(title: "予測精度", value: item.predictionAccuracy ?? 0, format: "%.1f%%", color: .blue)
+            metricView(title: "効率指数", value: item.efficiencyIndex ?? 0, format: "%.2f", color: .orange)
+            metricView(title: "時間節約", value: item.timeSavingAchievement ?? 0, format: "%.1f%%", color: .green)
         }
     }
     
@@ -95,9 +95,9 @@ struct TaskCompletionView: View {
     
     private var detailedMetricsView: some View {
         VStack(alignment: .leading, spacing: 10) {
-            metricDetailRow(title: "予測精度", value: predictionAccuracy, description: "予測時間と実際の時間の差を示します。100%に近いほど予測が正確です。")
-            metricDetailRow(title: "効率指数", value: efficiencyIndex, description: "1.0未満は予測より早く、1.0超は予測より遅く完了したことを示します。")
-            metricDetailRow(title: "時間節約達成度", value: timeSavingAchievement, description: "正の値は時間を節約し、負の値は予測より時間がかかったことを示します。")
+            metricDetailRow(title: "予測精度", value: item.predictionAccuracy ?? 0, description: "予測時間と実際の時間の差を示します。100%に近いほど予測が正確です。")
+            metricDetailRow(title: "効率指数", value: item.efficiencyIndex ?? 0, description: "1.0未満は予測より早く、1.0超は予測より遅く完了したことを示します。")
+            metricDetailRow(title: "時間節約達成度", value: item.timeSavingAchievement ?? 0, description: "正の値は時間を節約し、負の値は予測より時間がかかったことを示します。")
         }
         .padding()
         .background(Color(UIColor.tertiarySystemBackground))
@@ -134,22 +134,6 @@ struct TaskCompletionView: View {
         formatter.unitsStyle = .abbreviated
         return formatter.string(from: interval) ?? "N/A"
     }
-    
-    // メトリクスの計算
-    private var predictionAccuracy: Double {
-        guard let estimatedTime = item.estimatedTime, let elapsedTime = item.elapsedTime else { return 0.0 }
-        return 100 - abs(elapsedTime - estimatedTime) / estimatedTime * 100
-    }
-    
-    private var efficiencyIndex: Double {
-        guard let estimatedTime = item.estimatedTime, let elapsedTime = item.elapsedTime else { return 0.0 }
-        return elapsedTime / estimatedTime
-    }
-    
-    private var timeSavingAchievement: Double {
-        guard let estimatedTime = item.estimatedTime, let elapsedTime = item.elapsedTime else { return 0.0 }
-        return (estimatedTime - elapsedTime) / estimatedTime * 100
-    }
 }
 
 struct TaskCompletionView_Previews: PreviewProvider {
@@ -162,7 +146,7 @@ struct TaskCompletionView_Previews: PreviewProvider {
             isDone: true,
             estimatedTime: 7200, // 2時間
             progress: 1.0,
-            lastUpdated: Date(),
+            lastUpdated: Date().timeIntervalSince1970,  // ここを修正
             actualTime: nil,
             elapsedTime: 5400    // 1時間30分
         ))
@@ -179,7 +163,7 @@ struct TaskCompletionView_Previews: PreviewProvider {
             isDone: true,
             estimatedTime: 3600, // 1時間
             progress: 1.0,
-            lastUpdated: Date(),
+            lastUpdated: Date().timeIntervalSince1970,  // ここも修正
             actualTime: nil,
             elapsedTime: 4500    // 1時間15分
         ))

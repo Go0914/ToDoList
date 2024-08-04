@@ -55,8 +55,10 @@ class ToDoListViewViewModel: ObservableObject {
                 // ドキュメントをToDoListItemオブジェクトに変換
                 self.items = querySnapshot?.documents.compactMap { document in
                     do {
-                        let item = try document.data(as: ToDoListItem.self)
+                        var item = try document.data(as: ToDoListItem.self)
+                        item.calculateMetrics()
                         print("Successfully parsed item: \(item)")
+                        print("Parsed item metrics - predictionAccuracy: \(item.predictionAccuracy ?? 0), efficiencyIndex: \(item.efficiencyIndex ?? 0), timeSavingAchievement: \(item.timeSavingAchievement ?? 0)")
                         return item
                     } catch {
                         print("Error parsing document \(document.documentID): \(error)")
@@ -64,13 +66,17 @@ class ToDoListViewViewModel: ObservableObject {
                         if let title = document.data()["title"] as? String,
                            let dueDate = document.data()["dueDate"] as? TimeInterval,
                            let createdDate = document.data()["createdDate"] as? TimeInterval {
-                            return ToDoListItem(id: document.documentID,
-                                                title: title,
-                                                dueDate: dueDate,
-                                                createdDate: createdDate,
-                                                isDone: document.data()["isDone"] as? Bool ?? false,
-                                                estimatedTime: document.data()["estimatedTime"] as? Double,
-                                                progress: document.data()["progress"] as? Double ?? 0.0)
+                            var item = ToDoListItem(id: document.documentID,
+                                                    title: title,
+                                                    dueDate: dueDate,
+                                                    createdDate: createdDate,
+                                                    isDone: document.data()["isDone"] as? Bool ?? false,
+                                                    estimatedTime: document.data()["estimatedTime"] as? Double,
+                                                    progress: document.data()["progress"] as? Double ?? 0.0,
+                                                    elapsedTime: document.data()["elapsedTime"] as? Double ?? 0)
+                            item.calculateMetrics()
+                            print("Parsed item metrics (from partial data) - predictionAccuracy: \(item.predictionAccuracy ?? 0), efficiencyIndex: \(item.efficiencyIndex ?? 0), timeSavingAchievement: \(item.timeSavingAchievement ?? 0)")
+                            return item
                         }
                         return nil
                     }
@@ -83,13 +89,15 @@ class ToDoListViewViewModel: ObservableObject {
     // 新しいアイテムを追加する関数
     func addItem(_ item: ToDoListItem) {
         print("Adding item: \(item)")
+        var newItem = item
+        newItem.elapsedTime = 0
         let db = Firestore.firestore()
         do {
             try db.collection("users")
                 .document(userId)
                 .collection("todos")
-                .document(item.id)
-                .setData(from: item)
+                .document(newItem.id)
+                .setData(from: newItem)
             
             print("Item added successfully")
         } catch {

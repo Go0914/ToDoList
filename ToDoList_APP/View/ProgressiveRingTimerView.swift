@@ -1,21 +1,14 @@
 import SwiftUI
 
 struct ProgressiveRingTimerView: View {
-    @StateObject var viewModel: ProgressiveRingTimerViewModel
+    @ObservedObject var viewModel: ProgressiveRingTimerViewModel
     var color: Color
-
-    init(estimatedTime: Double?, color: Color) {
-        _viewModel = StateObject(wrappedValue: ProgressiveRingTimerViewModel(estimatedTime: estimatedTime))
-        self.color = color
-    }
 
     var body: some View {
         ZStack {
-            // 背景の薄いグレーの円
             Circle()
                 .stroke(Color.gray.opacity(0.2), lineWidth: 5)
             
-            // 進行状況を示す色付きの円
             Circle()
                 .trim(from: 0, to: CGFloat(viewModel.progress.truncatingRemainder(dividingBy: 1)))
                 .stroke(style: StrokeStyle(lineWidth: 5, lineCap: .round))
@@ -60,7 +53,7 @@ struct ProgressiveRingTimerView: View {
 
 struct ProgressiveRingTimerView_Previews: PreviewProvider {
     static var previews: some View {
-        ProgressiveRingTimerView(estimatedTime: 0.25, color: .blue)
+        ProgressiveRingTimerView(viewModel: ProgressiveRingTimerViewModel(estimatedTime: 0.25), color: .blue)
             .frame(width: 100, height: 100)
     }
 }

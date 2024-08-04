@@ -1,12 +1,13 @@
 import SwiftUI
 
 struct ToDoListItemView: View {
-    @StateObject private var viewModel = ToDoListItemViewViewModel()
+    @StateObject private var viewModel: ToDoListItemViewViewModel
     @State private var item: ToDoListItem
     @State private var showCompletionView = false
     
     init(item: ToDoListItem) {
         _item = State(initialValue: item)
+        _viewModel = StateObject(wrappedValue: ToDoListItemViewViewModel(item: item))
     }
     
     var body: some View {
@@ -47,6 +48,14 @@ struct ToDoListItemView: View {
             }
         }
         .animation(.spring(), value: showCompletionView)
+        .onAppear {
+            viewModel.setCurrentItem(item)
+        }
+        .onChange(of: viewModel.currentItem?.elapsedTime) { _ in
+            if let updatedItem = viewModel.currentItem {
+                item = updatedItem
+            }
+        }
     }
     
     private var itemContent: some View {
@@ -57,9 +66,11 @@ struct ToDoListItemView: View {
             .frame(height: 105)
             .overlay(
                 HStack(spacing: 16) {
-                    ProgressiveRingTimerView(estimatedTime: item.estimatedTime, color: ringColor)
-                        .frame(width: 80, height: 80)
-                        .padding(CGFloat(item.progress))
+                    if let timerViewModel = viewModel.timerViewModel {
+                        ProgressiveRingTimerView(viewModel: timerViewModel, color: ringColor)
+                            .frame(width: 80, height: 80)
+                            .padding(CGFloat(item.progress))
+                    }
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text(item.title)
@@ -101,24 +112,13 @@ struct ToDoListItemView: View {
                 }
                 .padding()
             )
-            .onAppear {
-                viewModel.setCurrentItem(item)
-            }
     }
     
     private func toggleItemCompletion() {
-        if !item.isDone {
-            item.isDone = true
-            viewModel.toggleIsDone(item: item)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation {
-                    showCompletionView = true
-                }
-            }
-        } else {
+        viewModel.toggleIsDone(item: item)
+        if item.isDone {
             withAnimation {
-                item.isDone = false
-                viewModel.toggleIsDone(item: item)
+                showCompletionView = true
             }
         }
     }
@@ -126,7 +126,7 @@ struct ToDoListItemView: View {
     var ringColor: Color {
         if item.isDone {
             return .green
-        } else if viewModel.progress >= 1.0 {
+        } else if viewModel.timerViewModel?.progress ?? 0 >= 1.0 {
             return .red
         } else {
             return .blue
@@ -154,7 +154,8 @@ struct ToDoListItemView_Previews: PreviewProvider {
             isDone: false,
             estimatedTime: 2.5,
             progress: 0.5,
-            lastUpdated: Date()
+            lastUpdated: Date().timeIntervalSince1970,
+            elapsedTime: 0
         ))
     }
 }
