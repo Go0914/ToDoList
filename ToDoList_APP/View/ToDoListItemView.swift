@@ -18,30 +18,29 @@ struct ToDoListItemView: View {
                 Color.black.opacity(0.4)
                     .edgesIgnoringSafeArea(.all)
                     .onTapGesture {
-                        withAnimation {
+                        withAnimation(.spring()) {
                             showCompletionView = false
                         }
                     }
                 
                 VStack {
-                    TaskCompletionView(item: item)
-                        .transition(.scale)
+                    TaskCompletionView(viewModel: TaskCompletionViewModel(item: item))
+                        .transition(.scale.combined(with: .opacity))
                         .zIndex(1)
                     
                     Spacer()
                     
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            withAnimation {
-                                showCompletionView = false
-                            }
-                        }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.gray)
-                                .font(.title2)
-                                .padding()
+                    Button(action: {
+                        withAnimation(.spring()) {
+                            showCompletionView = false
                         }
+                    }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.white)
+                            .font(.title)
+                            .padding()
+                            .background(Color(hex: "#3F2B96").opacity(0.8))
+                            .clipShape(Circle())
                     }
                 }
                 .padding()
@@ -56,33 +55,44 @@ struct ToDoListItemView: View {
                 item = updatedItem
             }
         }
+        .onChange(of: item.isDone) { isDone in
+            if isDone {
+                withAnimation(.spring()) {
+                    showCompletionView = true
+                }
+            }
+        }
     }
     
     private var itemContent: some View {
-        RoundedRectangle(cornerRadius: 10)
-            .stroke(lineWidth: 1)
-            .foregroundColor(item.isDone ? Color.green : Color("toDoListItemColor"))
-            .shadow(color: Color.gray.opacity(0.2), radius: 5, x: 0, y: 2)
-            .frame(height: 105)
+        RoundedRectangle(cornerRadius: 20)
+            .fill(Color.white)
+            .shadow(color: Color(hex: "#3F2B96").opacity(0.1), radius: 10, x: 0, y: 5)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color(hex: "#A8C0FF"), lineWidth: 2)
+            )
+            .frame(height: 120)
             .overlay(
                 HStack(spacing: 16) {
                     if let timerViewModel = viewModel.timerViewModel {
                         ProgressiveRingTimerView(viewModel: timerViewModel, color: ringColor)
                             .frame(width: 80, height: 80)
-                            .padding(CGFloat(item.progress))
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text(item.title)
-                            .font(.callout)
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(Color(hex: "#3F2B96"))
                             .lineLimit(2)
                         
                         HStack(spacing: 8) {
-                            Image(systemName: "calendar.badge.checkmark")
+                            Image(systemName: "calendar")
                                 .font(.subheadline)
+                                .foregroundColor(Color(hex: "#3F2B96"))
                             Text(Date(timeIntervalSince1970: item.dueDate).formatted(.dateTime.month(.defaultDigits).day(.defaultDigits)))
                                 .font(.subheadline)
-                                .foregroundColor(Color(.secondaryLabel))
+                                .foregroundColor(Color(hex: "#666666"))
                         }
                         
                         if let estimatedTime = item.estimatedTime {
@@ -92,10 +102,10 @@ struct ToDoListItemView: View {
                                 Text(formattedTime(from: estimatedTime))
                                     .font(.footnote)
                             }
-                            .foregroundColor(Color(.secondaryLabel))
+                            .foregroundColor(Color(hex: "#3F2B96"))
                             .padding(.vertical, 4)
                             .padding(.horizontal, 8)
-                            .background(Color("toDoListItemColor"))
+                            .background(Color(hex: "#E8EDF5"))
                             .cornerRadius(10)
                         }
                     }
@@ -104,8 +114,8 @@ struct ToDoListItemView: View {
                     
                     Button(action: toggleItemCompletion) {
                         Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
-                            .font(.title2)
-                            .foregroundColor(Color.blue)
+                            .font(.system(size: 28, weight: .semibold))
+                            .foregroundColor(item.isDone ? Color(hex: "#3F2B96") : Color(hex: "#A8C0FF"))
                             .frame(width: 44, height: 44)
                     }
                     .contentShape(Rectangle())
@@ -116,20 +126,13 @@ struct ToDoListItemView: View {
     
     private func toggleItemCompletion() {
         viewModel.toggleIsDone(item: item)
-        if item.isDone {
-            withAnimation {
-                showCompletionView = true
-            }
-        }
     }
     
     var ringColor: Color {
         if item.isDone {
-            return .green
-        } else if viewModel.timerViewModel?.progress ?? 0 >= 1.0 {
-            return .red
+            return Color(hex: "#3F2B96")
         } else {
-            return .blue
+            return Color(hex: "#A8C0FF")
         }
     }
     
@@ -157,5 +160,7 @@ struct ToDoListItemView_Previews: PreviewProvider {
             lastUpdated: Date().timeIntervalSince1970,
             elapsedTime: 0
         ))
+        .padding()
+        .background(Color(hex: "#F4F6F9"))
     }
 }

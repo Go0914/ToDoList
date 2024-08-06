@@ -1,62 +1,117 @@
 import SwiftUI
 
 struct LoginView: View {
-    @StateObject var viewModel = LoginViewViewModel()
+    @StateObject private var viewModel = LoginViewViewModel()
+    @State private var isLoading = false
     
     var body: some View {
-        NavigationView {
-            VStack {
-                // Header
-                HeaderView(title: "To Do List",
-                           subtitle: "Get Things Done",
-                           angle: 15,
-                           background: .pink)
+        ZStack {
+            // Background gradient
+            LinearGradient(gradient: Gradient(colors: [Color.purple.opacity(0.6), Color.blue.opacity(0.6)]),
+                           startPoint: .topLeading,
+                           endPoint: .bottomTrailing)
+                .ignoresSafeArea()
             
+            VStack(spacing: 20) {
+                // Logo
+                Image(systemName: "checkmark.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100, height: 100)
+                    .foregroundColor(.white)
+                    .shadow(radius: 10)
                 
-                Form {
-                    
+                Text("To Do List")
+                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .shadow(radius: 5)
+                
+                // Login Form
+                VStack(spacing: 15) {
                     if !viewModel.errorMessage.isEmpty {
                         Text(viewModel.errorMessage)
                             .foregroundColor(.red)
-                        
+                            .padding()
                     }
                     
-                    TextField("Email Address",
-                              text: $viewModel.email)
-                        .textFieldStyle(DefaultTextFieldStyle())
-                        .autocapitalization(.none)
-                        .autocorrectionDisabled()
+                    CustomTextField(placeholder: "Email Address", text: $viewModel.email, systemImage: "envelope")
                     
-                    SecureField("Password",
-                                text: $viewModel.password)
-                        .textFieldStyle(DefaultTextFieldStyle())
+                    CustomTextField(placeholder: "Password", text: $viewModel.password, isSecure: true, systemImage: "lock")
                     
-                    TLButton(
-                        title: "Log In",
-                        backgroud: .blue){
+                    Button(action: {
+                        withAnimation {
+                            isLoading = true
+                        }
                         viewModel.login()
+                    }) {
+                        ZStack {
+                            Text("Log In")
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .opacity(isLoading ? 0 : 1)
+                            
+                            if isLoading {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                        .shadow(radius: 5)
                     }
-                    
-                    .padding()
+                    .disabled(isLoading)
                 }
-                .offset(y: -50)
+                .padding()
+                .background(Color.white.opacity(0.2))
+                .cornerRadius(20)
+                .shadow(radius: 10)
+                .padding(.horizontal)
                 
-                // Create Account
-                VStack {
-                    Text("Don't have an account?")
-                    NavigationLink("Create An Account", destination: RegisterView())
+                // Create Account Link
+                NavigationLink(destination: RegisterView()) {
+                    Text("Don't have an account? Create one")
+                        .foregroundColor(.white)
+                        .underline()
                 }
-                .padding(.top, 20)
-                
-                Spacer()
+                .padding(.top)
             }
-            .padding(.bottom, 50)
-            
+            .padding()
         }
     }
 }
 
+struct CustomTextField: View {
+    let placeholder: String
+    @Binding var text: String
+    var isSecure: Bool = false
+    let systemImage: String
+    
+    var body: some View {
+        HStack {
+            Image(systemName: systemImage)
+                .foregroundColor(.white)
+            
+            Group {
+                if isSecure {
+                    SecureField(placeholder, text: $text)
+                } else {
+                    TextField(placeholder, text: $text)
+                }
+            }
+            .foregroundColor(.white)
+        }
+        .padding()
+        .background(Color.white.opacity(0.2))
+        .cornerRadius(10)
+        .autocapitalization(.none)
+        .autocorrectionDisabled()
+    }
+}
 
-#Preview {
-    LoginView()
+struct LoginView_Previews: PreviewProvider {
+    static var previews: some View {
+        LoginView()
+    }
 }

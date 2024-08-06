@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		970B48192C6077D200F7C21A /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970B48182C6077D200F7C21A /* ColorExtension.swift */; };
+		970B481A2C6077D200F7C21A /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970B48182C6077D200F7C21A /* ColorExtension.swift */; };
+		970B481B2C6077D200F7C21A /* ColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970B48182C6077D200F7C21A /* ColorExtension.swift */; };
+		970B481D2C60C8CA00F7C21A /* TaskCompletionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970B481C2C60C8CA00F7C21A /* TaskCompletionViewModel.swift */; };
+		970B481E2C60C8CA00F7C21A /* TaskCompletionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970B481C2C60C8CA00F7C21A /* TaskCompletionViewModel.swift */; };
+		970B481F2C60C8CA00F7C21A /* TaskCompletionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970B481C2C60C8CA00F7C21A /* TaskCompletionViewModel.swift */; };
 		9779AF082C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9779AF072C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift */; };
 		9779AF092C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9779AF072C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift */; };
 		9779AF0A2C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9779AF072C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift */; };
@@ -137,6 +143,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		970B48182C6077D200F7C21A /* ColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtension.swift; sourceTree = "<group>"; };
+		970B481C2C60C8CA00F7C21A /* TaskCompletionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskCompletionViewModel.swift; sourceTree = "<group>"; };
 		9779AF072C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressiveRingTimerViewModel.swift; sourceTree = "<group>"; };
 		97E046D02C574297002932BE /* ToDoList.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoList.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		97E0476E2C5742E0002932BE /* ToDoListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListItem.swift; sourceTree = "<group>"; };
@@ -257,6 +265,7 @@
 				97E047722C5742E0002932BE /* Assets.xcassets */,
 				97E047732C5742E0002932BE /* extensions.swift */,
 				97E047762C5742E0002932BE /* ToDoList_App.swift */,
+				970B48182C6077D200F7C21A /* ColorExtension.swift */,
 			);
 			path = Other;
 			sourceTree = "<group>";
@@ -300,6 +309,7 @@
 				97E0478B2C5742E0002932BE /* ToDoListViewViewModel.swift */,
 				9779AF072C5B3CAA00700762 /* ProgressiveRingTimerViewModel.swift */,
 				97F0D5B12C5E11B400C4FA6F /* EfficiencyServiceViewModel.swift */,
+				970B481C2C60C8CA00F7C21A /* TaskCompletionViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -488,6 +498,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				970B481F2C60C8CA00F7C21A /* TaskCompletionViewModel.swift in Sources */,
 				97E047AB2C5742E0002932BE /* RegisterViewModel.swift in Sources */,
 				97E047AC2C5742E0002932BE /* ProfileView.swift in Sources */,
 				97E047AD2C5742E0002932BE /* User.swift in Sources */,
@@ -513,6 +524,7 @@
 				97E047C02C5742E0002932BE /* ProgressiveRingTimerView.swift in Sources */,
 				97E047C12C5742E0002932BE /* ToDoListItemViewViewModel.swift in Sources */,
 				97F0D5BB2C5E1C6800C4FA6F /* TaskCompletionView.swift in Sources */,
+				970B48192C6077D200F7C21A /* ColorExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -520,6 +532,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				970B481E2C60C8CA00F7C21A /* TaskCompletionViewModel.swift in Sources */,
 				97E047C22C5742E0002932BE /* RegisterViewModel.swift in Sources */,
 				97E047C32C5742E0002932BE /* ProfileView.swift in Sources */,
 				97E047C42C5742E0002932BE /* User.swift in Sources */,
@@ -545,6 +558,7 @@
 				97E047D72C5742E0002932BE /* ProgressiveRingTimerView.swift in Sources */,
 				97E047D82C5742E0002932BE /* ToDoListItemViewViewModel.swift in Sources */,
 				97F0D5BA2C5E1C6800C4FA6F /* TaskCompletionView.swift in Sources */,
+				970B481A2C6077D200F7C21A /* ColorExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -552,6 +566,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				970B481D2C60C8CA00F7C21A /* TaskCompletionViewModel.swift in Sources */,
 				97E047912C5742E0002932BE /* RegisterViewModel.swift in Sources */,
 				97E047922C5742E0002932BE /* ProfileView.swift in Sources */,
 				97E047932C5742E0002932BE /* User.swift in Sources */,
@@ -577,6 +592,7 @@
 				97E047A62C5742E0002932BE /* ProgressiveRingTimerView.swift in Sources */,
 				97E047A72C5742E0002932BE /* ToDoListItemViewViewModel.swift in Sources */,
 				97F0D5BC2C5E1C6800C4FA6F /* TaskCompletionView.swift in Sources */,
+				970B481B2C6077D200F7C21A /* ColorExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
