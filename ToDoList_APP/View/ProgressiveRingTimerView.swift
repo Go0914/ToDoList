@@ -8,24 +8,24 @@ struct ProgressiveRingTimerView: View {
         ZStack {
             // Background circle
             Circle()
-                .stroke(Color.gray.opacity(0.2), lineWidth: 5)
+                .stroke(Color(.systemGray5), lineWidth: 6)
             
             // Progress ring
             Circle()
                 .trim(from: 0, to: CGFloat(viewModel.progress.truncatingRemainder(dividingBy: 1)))
-                .stroke(style: StrokeStyle(lineWidth: 5, lineCap: .round))
-                .foregroundColor(viewModel.isCountingUp ? Color(hex: "#E74C3C") : color)
+                .stroke(style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                .foregroundColor(viewModel.isCountingUp ? .red : color)
                 .rotationEffect(Angle(degrees: -90))
                 .animation(.linear(duration: 0.1), value: viewModel.progress)
             
-            VStack(spacing: 2) {
+            VStack(spacing: 4) {
                 Text(timeString)
-                    .font(.system(size: 14, weight: .semibold, design: .monospaced))
-                    .foregroundColor(viewModel.isCountingUp ? Color(hex: "#E74C3C") : color)
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .foregroundColor(viewModel.isCountingUp ? .red : .primary)
                 
                 Text(progressString)
-                    .font(.system(size: 12, weight: .regular, design: .monospaced))
-                    .foregroundColor(viewModel.isCountingUp ? Color(hex: "#E74C3C") : color)
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundColor(.secondary)
                 
                 Button(action: {
                     if viewModel.isRunning {
@@ -35,10 +35,13 @@ struct ProgressiveRingTimerView: View {
                     }
                 }) {
                     Image(systemName: viewModel.isRunning ? "pause.fill" : "play.fill")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(viewModel.isCountingUp ? Color(hex: "#E74C3C") : color)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 28, height: 32)
+                        .background(viewModel.isCountingUp ? Color.red : color)
+                        .clipShape(Circle())
                 }
-                .frame(width: 24, height: 24)
+                .buttonStyle(PlainButtonStyle())
             }
         }
     }
@@ -58,10 +61,18 @@ struct ProgressiveRingTimerView: View {
 
 struct ProgressiveRingTimerView_Previews: PreviewProvider {
     static var previews: some View {
-        ProgressiveRingTimerView(viewModel: ProgressiveRingTimerViewModel(estimatedTime: 0.25), color: Color(hex: "#4A69BD"))
-            .frame(width: 80, height: 80)
+        ProgressiveRingTimerView(viewModel: ProgressiveRingTimerViewModel(estimatedTime: 0.25), color: .blue)
+            .frame(width: 120, height: 120)
             .previewLayout(.sizeThatFits)
             .padding()
-            .background(Color(hex: "#F4F6F9"))
+            .background(Color(.systemBackground))
+            .environment(\.colorScheme, .light)
+        
+        ProgressiveRingTimerView(viewModel: ProgressiveRingTimerViewModel(estimatedTime: 0.25), color: .blue)
+            .frame(width: 120, height: 120)
+            .previewLayout(.sizeThatFits)
+            .padding()
+            .background(Color(.systemBackground))
+            .environment(\.colorScheme, .dark)
     }
 }

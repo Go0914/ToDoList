@@ -39,7 +39,7 @@ struct ToDoListItemView: View {
                             .foregroundColor(.white)
                             .font(.title)
                             .padding()
-                            .background(Color(hex: "#3F2B96").opacity(0.8))
+                            .background(Color.appleBlue.opacity(0.8))
                             .clipShape(Circle())
                     }
                 }
@@ -66,33 +66,32 @@ struct ToDoListItemView: View {
     
     private var itemContent: some View {
         RoundedRectangle(cornerRadius: 20)
-            .fill(Color.white)
-            .shadow(color: Color(hex: "#3F2B96").opacity(0.1), radius: 10, x: 0, y: 5)
+            .fill(item.isDone ? Color(.systemGray5) : Color(.systemBackground))
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color(hex: "#A8C0FF"), lineWidth: 2)
+                    .stroke(Color.appleBlue.opacity(0.3), lineWidth: 1)
             )
             .frame(height: 120)
             .overlay(
                 HStack(spacing: 16) {
                     if let timerViewModel = viewModel.timerViewModel {
                         ProgressiveRingTimerView(viewModel: timerViewModel, color: ringColor)
-                            .frame(width: 80, height: 80)
+                            .frame(width: 100, height: 100)
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text(item.title)
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(Color(hex: "#3F2B96"))
+                            .foregroundColor(.primary)
                             .lineLimit(2)
                         
                         HStack(spacing: 8) {
                             Image(systemName: "calendar")
                                 .font(.subheadline)
-                                .foregroundColor(Color(hex: "#3F2B96"))
+                                .foregroundColor(.appleBlue)
                             Text(Date(timeIntervalSince1970: item.dueDate).formatted(.dateTime.month(.defaultDigits).day(.defaultDigits)))
                                 .font(.subheadline)
-                                .foregroundColor(Color(hex: "#666666"))
+                                .foregroundColor(.secondary)
                         }
                         
                         if let estimatedTime = item.estimatedTime {
@@ -102,10 +101,10 @@ struct ToDoListItemView: View {
                                 Text(formattedTime(from: estimatedTime))
                                     .font(.footnote)
                             }
-                            .foregroundColor(Color(hex: "#3F2B96"))
+                            .foregroundColor(.appleBlue)
                             .padding(.vertical, 4)
                             .padding(.horizontal, 8)
-                            .background(Color(hex: "#E8EDF5"))
+                            .background(Color.appleBlue.opacity(0.1))
                             .cornerRadius(10)
                         }
                     }
@@ -115,7 +114,7 @@ struct ToDoListItemView: View {
                     Button(action: toggleItemCompletion) {
                         Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
                             .font(.system(size: 28, weight: .semibold))
-                            .foregroundColor(item.isDone ? Color(hex: "#3F2B96") : Color(hex: "#A8C0FF"))
+                            .foregroundColor(item.isDone ? .appleLightBlue : .appleBlue)
                             .frame(width: 44, height: 44)
                     }
                     .contentShape(Rectangle())
@@ -129,11 +128,7 @@ struct ToDoListItemView: View {
     }
     
     var ringColor: Color {
-        if item.isDone {
-            return Color(hex: "#3F2B96")
-        } else {
-            return Color(hex: "#A8C0FF")
-        }
+        item.isDone ? .appleLightBlue : .appleBlue
     }
     
     func formattedTime(from time: Double) -> String {
@@ -161,6 +156,6 @@ struct ToDoListItemView_Previews: PreviewProvider {
             elapsedTime: 0
         ))
         .padding()
-        .background(Color(hex: "#F4F6F9"))
+        .background(Color(.systemBackground))
     }
 }

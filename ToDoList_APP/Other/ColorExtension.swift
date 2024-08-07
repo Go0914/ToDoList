@@ -25,4 +25,8 @@ extension Color {
             opacity: Double(a) / 255
         )
     }
+    
+    // Apple-style colors
+    static let appleBlue = Color(hex: "007AFF")
+    static let appleLightBlue = Color(hex: "5AC8FA")
 }

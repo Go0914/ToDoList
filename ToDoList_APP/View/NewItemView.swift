@@ -4,9 +4,12 @@ struct NewItemView: View {
     @StateObject var viewModel: NewItemViewViewModel
     @Binding var newItemPresented: Bool
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @State private var animationAmount: CGFloat = 1.0
     @State private var showCustomPicker = false
     @State private var selectedQuickDate: Int? = nil
+    @Namespace private var animation
+    @FocusState private var isTitleFocused: Bool
     
     init(newItemPresented: Binding<Bool>, toDoListViewModel: ToDoListViewViewModel) {
         self._newItemPresented = newItemPresented
@@ -19,70 +22,86 @@ struct NewItemView: View {
                 backgroundGradient
                 
                 ScrollView {
-                    VStack(spacing: 30) {
+                    VStack(spacing: 24) {
                         titleField
                         dateSelectionView
                         estimatedTimePicker
                         saveButton
                     }
-                    .padding(.vertical, 30)
+                    .padding(.vertical, 24)
                 }
             }
             .navigationTitle("New Task")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: { dismiss() }) {
-                        Image(systemName: "xmark")
-                            .foregroundColor(Color(hex: "#4A69BD"))
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.secondary)
+                            .font(.title3)
                     }
                 }
             }
         }
         .alert(isPresented: $viewModel.showAlert) {
-            Alert(title: Text("Error"), message: Text("Please fill in all fields and select a valid due date."))
+            Alert(title: Text("Incomplete Task"), message: Text("Please fill in all fields and select a valid due date."))
         }
     }
     
     private var backgroundGradient: some View {
-        LinearGradient(gradient: Gradient(colors: [Color(hex: "#8E44AD").opacity(0.1), Color(hex: "#4A69BD").opacity(0.1)]),
-                       startPoint: .topLeading,
-                       endPoint: .bottomTrailing)
-            .ignoresSafeArea()
+        LinearGradient(gradient: Gradient(colors: [
+            Color.blue.opacity(0.1),
+            Color.purple.opacity(0.05),
+            Color.teal.opacity(0.1)
+        ]), startPoint: .topLeading, endPoint: .bottomTrailing)
+        .ignoresSafeArea()
     }
     
     private var titleField: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Task Title")
+        VStack(alignment: .leading, spacing: 8) {
+            Text("What's your task?")
                 .font(.headline)
-                .foregroundColor(Color(hex: "#4A69BD"))
+                .foregroundColor(.primary)
             
             TextField("Enter task title", text: $viewModel.title)
                 .padding()
-                .background(Color.white.opacity(0.2))
-                .cornerRadius(15)
+                .background(colorScheme == .dark ? Color(.systemGray6) : .white)
+                .cornerRadius(12)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 15)
-                        .stroke(Color(hex: "#4A69BD").opacity(0.5), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(isTitleFocused ? Color.blue : Color(.systemGray4), lineWidth: 2)
                 )
-                .shadow(color: Color(hex: "#4A69BD").opacity(0.1), radius: 5, x: 0, y: 2)
+                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                .focused($isTitleFocused)
+            
+            Text("Task title is required")
+                .font(.caption)
+                .foregroundColor(.red)
+                .opacity(viewModel.title.isEmpty && !isTitleFocused ? 1 : 0)
         }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(colorScheme == .dark ? Color(.systemGray5) : .white)
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        )
         .padding(.horizontal)
     }
     
     private var dateSelectionView: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            Text("Due Date")
+        VStack(alignment: .leading, spacing: 12) {
+            Text("When is it due?")
                 .font(.headline)
-                .foregroundColor(Color(hex: "#4A69BD"))
+                .foregroundColor(.primary)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    ForEach(0..<6) { index in
+                    ForEach(0..<quickSelectTitles.count, id: \.self) { index in
                         QuickSelectButton(title: quickSelectTitles[index],
                                           date: quickSelectDates[index],
                                           selectedDate: $viewModel.dueDate,
                                           isSelected: selectedQuickDate == index,
+                                          namespace: animation,
                                           action: {
                                               withAnimation(.spring()) {
                                                   selectedQuickDate = index
@@ -92,7 +111,7 @@ struct NewItemView: View {
                                           })
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 4)
             }
             
             Button(action: {
@@ -102,57 +121,75 @@ struct NewItemView: View {
                 }
             }) {
                 HStack {
-                    Image(systemName: "calendar")
-                    Text("Custom Date")
+                    Image(systemName: showCustomPicker ? "calendar.badge.minus" : "calendar.badge.plus")
+                    Text(showCustomPicker ? "Hide Calendar" : "Custom Date")
                 }
-                .foregroundColor(Color(hex: "#4A69BD"))
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color(hex: "#4A69BD").opacity(0.1))
-                .cornerRadius(15)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 15)
-                        .stroke(Color(hex: "#4A69BD").opacity(0.5), lineWidth: 1)
-                )
+                .font(.subheadline.weight(.medium))
+                .foregroundColor(.teal)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 14)
+                .background(Color.teal.opacity(0.1))
+                .cornerRadius(10)
             }
             
             if showCustomPicker {
                 DatePicker("Select Date", selection: $viewModel.dueDate, in: Date()..., displayedComponents: .date)
                     .datePickerStyle(GraphicalDatePickerStyle())
                     .padding()
-                    .background(Color.white.opacity(0.2))
-                    .cornerRadius(15)
-                    .shadow(color: Color(hex: "#4A69BD").opacity(0.1), radius: 5, x: 0, y: 2)
+                    .background(colorScheme == .dark ? Color(.systemGray6) : .white)
+                    .cornerRadius(12)
+                    .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                    .transition(.scale.combined(with: .opacity))
             }
             
-            Text("Selected: \(viewModel.dueDate, formatter: itemFormatter)")
-                .foregroundColor(Color(hex: "#4A69BD"))
-                .padding(.top, 5)
+            Text("Selected: \(viewModel.dueDate.formatted(date: .long, time: .omitted))")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
         }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(colorScheme == .dark ? Color(.systemGray5) : .white)
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        )
         .padding(.horizontal)
     }
     
     private var estimatedTimePicker: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Estimated Time")
+        VStack(alignment: .leading, spacing: 12) {
+            Text("How long will it take?")
                 .font(.headline)
-                .foregroundColor(Color(hex: "#4A69BD"))
+                .foregroundColor(.primary)
             
-            Picker("", selection: $viewModel.estimatedTimeIndex) {
-                ForEach(0..<estimatedTimes.count) { index in
-                    Text(estimatedTimes[index]).tag(index)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                ForEach(0..<estimatedTimes.count, id: \.self) { index in
+                    Button(action: {
+                        withAnimation(.spring()) {
+                            viewModel.estimatedTimeIndex = index
+                        }
+                    }) {
+                        Text(estimatedTimes[index])
+                            .font(.subheadline.weight(.medium))
+                            .padding(.vertical, 10)
+                            .frame(maxWidth: .infinity)
+                            .background(viewModel.estimatedTimeIndex == index ? Color.orange : (colorScheme == .dark ? Color(.systemGray6) : .white))
+                            .foregroundColor(viewModel.estimatedTimeIndex == index ? .white : .primary)
+                            .cornerRadius(10)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.orange, lineWidth: viewModel.estimatedTimeIndex == index ? 0 : 1)
+                            )
+                            .shadow(color: Color.black.opacity(viewModel.estimatedTimeIndex == index ? 0.1 : 0), radius: 5, x: 0, y: 2)
+                    }
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding()
-            .background(Color.white.opacity(0.2))
-            .cornerRadius(15)
-            .overlay(
-                RoundedRectangle(cornerRadius: 15)
-                    .stroke(Color(hex: "#4A69BD").opacity(0.5), lineWidth: 1)
-            )
-            .shadow(color: Color(hex: "#4A69BD").opacity(0.1), radius: 5, x: 0, y: 2)
         }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(colorScheme == .dark ? Color(.systemGray5) : .white)
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        )
         .padding(.horizontal)
     }
     
@@ -171,25 +208,29 @@ struct NewItemView: View {
                 viewModel.showAlert = true
             }
         }) {
-            Text("Save Task")
-                .fontWeight(.bold)
+            Text("Add Task")
+                .font(.headline)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
-                .padding()
+                .padding(.vertical, 16)
                 .background(
-                    LinearGradient(gradient: Gradient(colors: [Color(hex: "#4A69BD"), Color(hex: "#8E44AD")]),
+                    viewModel.canSave ?
+                    LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple.opacity(0.8)]),
+                                   startPoint: .leading,
+                                   endPoint: .trailing) :
+                    LinearGradient(gradient: Gradient(colors: [Color.gray.opacity(0.5), Color.gray.opacity(0.3)]),
                                    startPoint: .leading,
                                    endPoint: .trailing)
                 )
-                .cornerRadius(15)
-                .shadow(color: Color(hex: "#4A69BD").opacity(0.3), radius: 5, x: 0, y: 3)
+                .cornerRadius(16)
+                .shadow(color: viewModel.canSave ? Color.blue.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
         }
         .padding(.horizontal)
         .scaleEffect(animationAmount)
         .disabled(!viewModel.canSave)
     }
     
-    private var quickSelectTitles = ["Today", "Tomorrow", "In 2 Days", "This Weekend", "Next Monday", "In a Week"]
+    private var quickSelectTitles = ["Today", "Tomorrow", "In 2 Days", "This Week", "Next Week", "Next Month"]
     
     private var quickSelectDates: [Date] {
         let calendar = Calendar.current
@@ -198,26 +239,10 @@ struct NewItemView: View {
             today,
             calendar.date(byAdding: .day, value: 1, to: today)!,
             calendar.date(byAdding: .day, value: 2, to: today)!,
-            nextWeekend(),
-            nextMonday(),
-            calendar.date(byAdding: .day, value: 7, to: today)!
+            calendar.date(byAdding: .weekOfYear, value: 1, to: today)!,
+            calendar.date(byAdding: .weekOfYear, value: 2, to: today)!,
+            calendar.date(byAdding: .month, value: 1, to: today)!
         ]
-    }
-    
-    private func nextWeekend() -> Date {
-        let calendar = Calendar.current
-        let today = Date()
-        let weekday = calendar.component(.weekday, from: today)
-        let daysUntilWeekend = weekday > 6 ? 7 - weekday + 6 : 6 - weekday
-        return calendar.date(byAdding: .day, value: daysUntilWeekend, to: today)!
-    }
-    
-    private func nextMonday() -> Date {
-        let calendar = Calendar.current
-        let today = Date()
-        let weekday = calendar.component(.weekday, from: today)
-        let daysUntilMonday = weekday == 2 ? 7 : 9 - weekday
-        return calendar.date(byAdding: .day, value: daysUntilMonday, to: today)!
     }
 }
 
@@ -226,30 +251,42 @@ struct QuickSelectButton: View {
     let date: Date
     @Binding var selectedDate: Date
     let isSelected: Bool
+    var namespace: Namespace.ID
     let action: () -> Void
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .padding(.vertical, 10)
-                .padding(.horizontal, 15)
-                .background(isSelected ? Color(hex: "#4A69BD") : Color.white.opacity(0.2))
-                .foregroundColor(isSelected ? .white : Color(hex: "#4A69BD"))
-                .cornerRadius(20)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color(hex: "#4A69BD").opacity(0.5), lineWidth: 1)
-                )
-                .shadow(color: Color(hex: "#4A69BD").opacity(isSelected ? 0.3 : 0.1), radius: 5, x: 0, y: 2)
+            VStack(spacing: 6) {
+                Text(title)
+                    .font(.subheadline.weight(.medium))
+                Text(date.formatted(.dateTime.day().month(.defaultDigits)))
+                    .font(.caption2)
+                    .opacity(0.7)
+            }
+            .padding(.vertical, 10)
+            .padding(.horizontal, 14)
+            .background(
+                ZStack {
+                    if isSelected {
+                        Color.blue
+                            .matchedGeometryEffect(id: "background_\(title)", in: namespace)
+                    } else {
+                        colorScheme == .dark ? Color(.systemGray6) : .white
+                    }
+                }
+            )
+            .foregroundColor(isSelected ? .white : .primary)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.blue, lineWidth: isSelected ? 0 : 1)
+            )
+            .shadow(color: Color.black.opacity(isSelected ? 0.1 : 0), radius: 5, x: 0, y: 2)
         }
+        .animation(.spring(), value: isSelected)
     }
 }
-
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .medium
-    return formatter
-}()
 
 private let estimatedTimes = ["15min", "30min", "1h", "1.5h", "2h", "2.5h", "3h"]
 
@@ -259,5 +296,12 @@ struct NewItemView_Previews: PreviewProvider {
             newItemPresented: .constant(true),
             toDoListViewModel: ToDoListViewViewModel(userId: "preview_user_id")
         )
+        .preferredColorScheme(.light)
+        
+        NewItemView(
+            newItemPresented: .constant(true),
+            toDoListViewModel: ToDoListViewViewModel(userId: "preview_user_id")
+        )
+        .preferredColorScheme(.dark)
     }
 }
