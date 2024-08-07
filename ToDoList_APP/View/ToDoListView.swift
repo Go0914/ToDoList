@@ -74,8 +74,13 @@ struct ToDoListView: View {
     var filteredItems: [ToDoListItem] {
         let sortedItems = viewModel.items.sorted { item1, item2 in
             if item1.isDone == item2.isDone {
-                // 同じ完了状態の場合は、作成日時で並べ替え（新しい順）
-                return item1.dueDate > item2.dueDate
+                if item1.isDone {
+                    // 完了したタスクは完了日時の逆順（最近完了したものが先）
+                    return item1.lastUpdated > item2.lastUpdated
+                } else {
+                    // 未完了のタスクは期日順（期日が近いものが先）
+                    return item1.dueDate < item2.dueDate
+                }
             }
             // 未完了のタスクを先に、完了したタスクを後ろに
             return !item1.isDone && item2.isDone

@@ -45,7 +45,9 @@ class ProgressiveRingTimerViewModel: ObservableObject {
         isCountingUp = false
     }
 
-    func completeTask() {
+    func completeTask() -> (elapsedTime: TimeInterval, isOvertime: Bool) {
         stopTimer()
+        let isOvertime = elapsedTime > totalTime
+        return (elapsedTime, isOvertime)
     }
 }

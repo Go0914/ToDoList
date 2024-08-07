@@ -27,21 +27,39 @@ struct ProgressiveRingTimerView: View {
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundColor(.secondary)
                 
-                Button(action: {
-                    if viewModel.isRunning {
-                        viewModel.stopTimer()
-                    } else {
-                        viewModel.startTimer()
+                HStack(spacing: 8) {
+                    // Reset button
+                    if !viewModel.isRunning {
+                        Button(action: viewModel.resetTimer) {
+                            Image(systemName: "arrow.counterclockwise")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 24, height: 24)
+                                .background(color)
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .transition(.opacity)
                     }
-                }) {
-                    Image(systemName: viewModel.isRunning ? "pause.fill" : "play.fill")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(width: 28, height: 32)
-                        .background(viewModel.isCountingUp ? Color.red : color)
-                        .clipShape(Circle())
+                    
+                    // Start/Stop button
+                    Button(action: {
+                        if viewModel.isRunning {
+                            viewModel.stopTimer()
+                        } else {
+                            viewModel.startTimer()
+                        }
+                    }) {
+                        Image(systemName: viewModel.isRunning ? "pause.fill" : "play.fill")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(width: 28, height: 32)
+                            .background(viewModel.isCountingUp ? Color.red : color)
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
-                .buttonStyle(PlainButtonStyle())
+                .animation(.easeInOut, value: viewModel.isRunning)
             }
         }
     }

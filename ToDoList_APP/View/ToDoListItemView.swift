@@ -4,6 +4,9 @@ struct ToDoListItemView: View {
     @StateObject private var viewModel: ToDoListItemViewViewModel
     @State private var item: ToDoListItem
     @State private var showCompletionView = false
+    @State private var showFeedback = false
+    @State private var feedbackMessage = ""
+    @State private var showDeleteConfirmation = false
     
     init(item: ToDoListItem) {
         _item = State(initialValue: item)
@@ -60,6 +63,28 @@ struct ToDoListItemView: View {
                 withAnimation(.spring()) {
                     showCompletionView = true
                 }
+                feedbackMessage = viewModel.generateFeedbackMessage(for: item)
+                showFeedback = true
+            }
+        }
+        .alert(isPresented: $showFeedback) {
+            Alert(title: Text("タスク完了"), message: Text(feedbackMessage), dismissButton: .default(Text("OK")))
+        }
+        .alert(isPresented: $showDeleteConfirmation) {
+            Alert(
+                title: Text("タスクの削除"),
+                message: Text("このタスクを削除してもよろしいですか？"),
+                primaryButton: .destructive(Text("削除")) {
+                    viewModel.deleteItem()
+                },
+                secondaryButton: .cancel(Text("キャンセル"))
+            )
+        }
+        .contextMenu {
+            Button(action: {
+                showDeleteConfirmation = true
+            }) {
+                Label("タスクを削除", systemImage: "trash")
             }
         }
     }
@@ -67,6 +92,7 @@ struct ToDoListItemView: View {
     private var itemContent: some View {
         RoundedRectangle(cornerRadius: 20)
             .fill(item.isDone ? Color(.systemGray5) : Color(.systemBackground))
+            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.appleBlue.opacity(0.3), lineWidth: 1)
@@ -125,6 +151,9 @@ struct ToDoListItemView: View {
     
     private func toggleItemCompletion() {
         viewModel.toggleIsDone(item: item)
+        if let updatedItem = viewModel.currentItem {
+            item = updatedItem
+        }
     }
     
     var ringColor: Color {
@@ -139,23 +168,5 @@ struct ToDoListItemView: View {
             return "\(minutes)min"
         }
         return "\(hours)h\(minutes)min"
-    }
-}
-
-struct ToDoListItemView_Previews: PreviewProvider {
-    static var previews: some View {
-        ToDoListItemView(item: ToDoListItem(
-            id: "123",
-            title: "テストタスク",
-            dueDate: Date().timeIntervalSince1970,
-            createdDate: Date().timeIntervalSince1970,
-            isDone: false,
-            estimatedTime: 2.5,
-            progress: 0.5,
-            lastUpdated: Date().timeIntervalSince1970,
-            elapsedTime: 0
-        ))
-        .padding()
-        .background(Color(.systemBackground))
     }
 }
