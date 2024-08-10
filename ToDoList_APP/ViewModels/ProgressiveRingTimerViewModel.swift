@@ -5,6 +5,7 @@ class ProgressiveRingTimerViewModel: ObservableObject {
     @Published var isRunning = false
     @Published var elapsedTime: TimeInterval = 0
     @Published var isCountingUp = false
+    @Published var isTaskCompleted = false
     private var timer: Timer?
     private let totalTime: TimeInterval
 
@@ -43,11 +44,17 @@ class ProgressiveRingTimerViewModel: ObservableObject {
         remainingTime = totalTime
         elapsedTime = 0
         isCountingUp = false
+        isTaskCompleted = false
     }
 
     func completeTask() -> (elapsedTime: TimeInterval, isOvertime: Bool) {
         stopTimer()
+        isTaskCompleted = true
         let isOvertime = elapsedTime > totalTime
         return (elapsedTime, isOvertime)
+    }
+
+    func canStartNewTask() -> Bool {
+        return !isRunning && (isTaskCompleted || elapsedTime == 0)
     }
 }
