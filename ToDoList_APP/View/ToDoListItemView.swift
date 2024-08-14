@@ -7,12 +7,14 @@ struct ToDoListItemView: View {
     @State private var showFeedback = false
     @State private var feedbackMessage = ""
     @State private var showDeleteConfirmation = false
-    
+    @State private var showTimerView = false
+    @State private var isBlinking = false
+
     init(item: ToDoListItem) {
         _item = State(initialValue: item)
         _viewModel = StateObject(wrappedValue: ToDoListItemViewViewModel(item: item))
     }
-    
+
     var body: some View {
         ZStack {
             itemContent
@@ -20,17 +22,31 @@ struct ToDoListItemView: View {
         .sheet(isPresented: $showCompletionView) {
             TaskCompletionView(viewModel: TaskCompletionViewModel(item: item))
         }
+        .sheet(isPresented: $showTimerView, onDismiss: {
+            if let isRunning = viewModel.timerViewModel?.isRunning {
+                isBlinking = isRunning
+            }
+        }) {
+            if let timerViewModel = viewModel.timerViewModel {
+                ProgressiveRingTimerView(viewModel: timerViewModel, color: ringColor)
+                    .frame(width: 300, height: 300) // ここでリングサイズを指定します
+            }
+        }
+        .onChange(of: viewModel.timerViewModel?.isRunning) { isRunning in
+            isBlinking = isRunning ?? false
+        }
         .animation(.spring(), value: showCompletionView)
         .onChange(of: viewModel.item.elapsedTime) { _ in
             item = viewModel.item
         }
         .onChange(of: item.isDone) { isDone in
-            if isDone {
+            if (isDone ?? false) == true {
                 withAnimation(.spring()) {
                     showCompletionView = true
                 }
                 feedbackMessage = viewModel.generateFeedbackMessage(for: item)
                 showFeedback = true
+                isBlinking = false
             }
         }
         .alert(isPresented: $showFeedback) {
@@ -54,84 +70,115 @@ struct ToDoListItemView: View {
             }
         }
     }
-    
+
     private var itemContent: some View {
-        RoundedRectangle(cornerRadius: 20)
-            .fill(item.isDone ? Color(.systemGray5) : Color(.systemBackground))
-            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        RoundedRectangle(cornerRadius: 16)
+            .fill(item.isDone ? Color(.systemGray6) : Color(.systemBackground))
+            .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
             .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.appleBlue.opacity(0.3), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.appleBlue.opacity(0.2), lineWidth: 1)
             )
-            .frame(height: 120)
+            .frame(height: 110)
             .overlay(
                 HStack(spacing: 16) {
-                    if let timerViewModel = viewModel.timerViewModel {
-                        ProgressiveRingTimerView(viewModel: timerViewModel, color: ringColor)
-                            .frame(width: 100, height: 100)
-                    }
+                    startButton
                     
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 6) {
                         Text(item.title)
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(.primary)
-                            .lineLimit(2)
-                        
-                        HStack(spacing: 8) {
-                            Image(systemName: "calendar")
-                                .font(.subheadline)
-                                .foregroundColor(.appleBlue)
-                            Text(Date(timeIntervalSince1970: item.dueDate).formatted(.dateTime.month(.defaultDigits).day(.defaultDigits)))
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        if let estimatedTime = item.estimatedTime {
-                            HStack(spacing: 4) {
-                                Image(systemName: "timer")
-                                    .font(.footnote)
-                                Text(formattedTime(from: estimatedTime))
-                                    .font(.footnote)
+                            .lineLimit(1)
+
+                        HStack(spacing: 12) {
+                            dateView
+                            if let estimatedTime = item.estimatedTime {
+                                estimatedTimeView(estimatedTime)
                             }
-                            .foregroundColor(.appleBlue)
-                            .padding(.vertical, 4)
-                            .padding(.horizontal, 8)
-                            .background(Color.appleBlue.opacity(0.1))
-                            .cornerRadius(10)
                         }
                     }
-                    
+
                     Spacer()
-                    
-                    Button(action: toggleItemCompletion) {
-                        Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
-                            .font(.system(size: 28, weight: .semibold))
-                            .foregroundColor(item.isDone ? .appleLightBlue : .appleBlue)
-                            .frame(width: 44, height: 44)
-                    }
-                    .contentShape(Rectangle())
+
+                    completionButton
                 }
-                .padding()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             )
     }
-    
+
+    private var startButton: some View {
+        Button(action: {
+            showTimerView = true
+        }) {
+            ZStack {
+                Circle()
+                    .fill(Color.appleBlue.opacity(0.1))
+                    .frame(width: 44, height: 44)
+                
+                Image(systemName: "play.fill")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundColor(.appleBlue)
+            }
+            .opacity(isBlinking ? 0.6 : 1.0)
+            .shadow(color: .appleBlue.opacity(0.3), radius: isBlinking ? 8 : 0)
+        }
+        .animation(isBlinking ? .easeInOut(duration: 0.6).repeatForever(autoreverses: true) : .default, value: isBlinking)
+    }
+
+    private var dateView: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "calendar")
+                .font(.system(size: 12))
+                .foregroundColor(.appleBlue)
+            Text(Date(timeIntervalSince1970: item.dueDate).formatted(.dateTime.month(.defaultDigits).day(.defaultDigits)))
+                .font(.system(size: 13))
+                .foregroundColor(.secondary)
+        }
+    }
+
+    private func estimatedTimeView(_ time: Double) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: "clock")
+                .font(.system(size: 12))
+            Text(formattedTime(from: time))
+                .font(.system(size: 13))
+        }
+        .foregroundColor(.appleBlue)
+        .padding(.vertical, 2)
+        .padding(.horizontal, 6)
+        .background(Color.appleBlue.opacity(0.1))
+        .cornerRadius(6)
+    }
+
+    private var completionButton: some View {
+        Button(action: toggleItemCompletion) {
+            Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
+                .font(.system(size: 26, weight: .semibold))
+                .foregroundColor(item.isDone ? .appleLightBlue : .appleBlue)
+        }
+        .frame(width: 44, height: 44)
+        .contentShape(Rectangle())
+    }
+
     private func toggleItemCompletion() {
         viewModel.toggleIsDone()
         item = viewModel.item
+        isBlinking = false
     }
-    
+
     var ringColor: Color {
         item.isDone ? .appleLightBlue : .appleBlue
     }
-    
+
     func formattedTime(from time: Double) -> String {
         let hours = Int(time)
         let minutes = Int((time - Double(hours)) * 60)
-        
+
         if hours == 0 {
-            return "\(minutes)min"
+            return "\(minutes)分"
         }
-        return "\(hours)h\(minutes)min"
+        return "\(hours)時間\(minutes)分"
     }
 }
 
@@ -139,12 +186,14 @@ struct ToDoListItemView_Previews: PreviewProvider {
     static var previews: some View {
         let sampleItem = ToDoListItem(
             id: UUID().uuidString,
-            title: "Sample Task",
+            title: "重要なプレゼンテーションの準備",
             dueDate: Date().timeIntervalSince1970,
             createdDate: Date().timeIntervalSince1970,
             isDone: false,
-            estimatedTime: 1.5
+            estimatedTime: 2.5
         )
         ToDoListItemView(item: sampleItem)
+            .previewLayout(.sizeThatFits)
+            .padding()
     }
 }

@@ -22,6 +22,9 @@ class ProgressiveRingTimerViewModel: ObservableObject {
     func updateTimerState(_ state: ToDoListItem.TimerState) {
         timerState = state
         isRunning = (state == .running)
+        if state == .completed {
+            isTaskCompleted = true
+        }
         objectWillChange.send()
     }
 

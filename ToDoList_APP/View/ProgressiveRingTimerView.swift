@@ -6,43 +6,62 @@ struct ProgressiveRingTimerView: View {
 
     var body: some View {
         ZStack {
-            // Background circle
+            // Background circle with gradient
             Circle()
-                .stroke(Color(.systemGray5), lineWidth: 6)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [Color(.systemGray6), Color(.systemGray4)]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ), lineWidth: 6)
+                .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
             
             // Progress ring
             Circle()
                 .trim(from: 0, to: CGFloat(viewModel.progress.truncatingRemainder(dividingBy: 1)))
-                .stroke(style: StrokeStyle(lineWidth: 6, lineCap: .round))
-                .foregroundColor(viewModel.isCountingUp ? .red : color)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [color.opacity(0.7), color]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                )
                 .rotationEffect(Angle(degrees: -90))
-                .animation(.linear(duration: 0.1), value: viewModel.progress)
-            
-            VStack(spacing: 4) {
+                .shadow(color: color.opacity(0.3), radius: 4, x: 0, y: 4)
+
+            VStack(spacing: 8) {
                 Text(timeString)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundColor(viewModel.isCountingUp ? .red : .primary)
                 
                 Text(progressString)
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
                     .foregroundColor(.secondary)
                 
-                HStack(spacing: 8) {
-                    // Reset button
+                HStack(spacing: 10) {
+                    // Reset button with shadow and gradient
                     if !viewModel.isRunning {
                         Button(action: viewModel.resetTimer) {
                             Image(systemName: "arrow.counterclockwise")
-                                .font(.system(size: 14, weight: .semibold))
+                                .font(.system(size: 16, weight: .semibold))
                                 .foregroundColor(.white)
-                                .frame(width: 24, height: 24)
-                                .background(color)
+                                .frame(width: 28, height: 28)
+                                .background(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [color.opacity(0.8), color]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
                                 .clipShape(Circle())
+                                .shadow(color: color.opacity(0.5), radius: 5, x: 0, y: 4)
                         }
                         .buttonStyle(PlainButtonStyle())
                         .transition(.opacity)
                     }
                     
-                    // Start/Stop button
+                    // Start/Stop button with shadow and gradient
                     Button(action: {
                         if viewModel.isRunning {
                             viewModel.pauseTimer()
@@ -51,15 +70,21 @@ struct ProgressiveRingTimerView: View {
                         }
                     }) {
                         Image(systemName: viewModel.isRunning ? "pause.fill" : "play.fill")
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.system(size: 20, weight: .semibold))
                             .foregroundColor(.white)
-                            .frame(width: 28, height: 32)
-                            .background(viewModel.isCountingUp ? Color.red : color)
+                            .frame(width: 32, height: 32)
+                            .background(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [viewModel.isCountingUp ? .red.opacity(0.8) : color.opacity(0.8), viewModel.isCountingUp ? .red : color]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
                             .clipShape(Circle())
+                            .shadow(color: viewModel.isCountingUp ? .red.opacity(0.5) : color.opacity(0.5), radius: 5, x: 0, y: 4)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
-                .animation(.easeInOut, value: viewModel.isRunning)
             }
         }
     }

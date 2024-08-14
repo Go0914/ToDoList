@@ -9,61 +9,69 @@ struct TaskCompletionView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 22) {
                 headerView
-                    .scaleEffect(animateCheckmark ? 1.2 : 0.8)
-                    .animation(.interpolatingSpring(stiffness: 70, damping: 10).delay(0.1), value: animateCheckmark)
-                    .onAppear {
-                        animateCheckmark = true
-                    }
+                    .scaleEffect(animateCheckmark ? 1.0 : 0.8)
+                    .opacity(animateCheckmark ? 1.0 : 0.0)
+                    .animation(.spring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.1).delay(0.1), value: animateCheckmark)
+                    .onAppear { animateCheckmark = true }
                 
                 timeComparisonView
-                    .scaleEffect(animateTimeCards ? 1.0 : 0.5)
+                    .offset(y: animateTimeCards ? 0 : 50)
                     .opacity(animateTimeCards ? 1.0 : 0.0)
-                    .animation(.easeOut(duration: 0.6).delay(0.2), value: animateTimeCards)
-                    .onAppear {
-                        animateTimeCards = true
-                    }
+                    .animation(.easeOut(duration: 0.7).delay(0.3), value: animateTimeCards)
+                    .onAppear { animateTimeCards = true }
                 
                 metricsView
                     .offset(y: animateMetricCards ? 0 : 50)
                     .opacity(animateMetricCards ? 1.0 : 0.0)
-                    .animation(.easeOut(duration: 0.7).delay(0.4), value: animateMetricCards)
-                    .onAppear {
-                        animateMetricCards = true
-                    }
+                    .animation(.easeOut(duration: 0.8).delay(0.5), value: animateMetricCards)
+                    .onAppear { animateMetricCards = true }
             }
-            .padding()
+            .padding(.horizontal)
         }
         .background(Color(UIColor.systemBackground))
     }
     
     private var headerView: some View {
-        HStack(spacing: 16) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 40))
-                .foregroundColor(.green)
+        HStack(spacing: 18) {
+            ZStack {
+                Circle()
+                    .fill(Color.green)
+                    .frame(width: 50, height: 50)
+                    .shadow(color: Color.green.opacity(0.3), radius: 8, x: 0, y: 3)
+                
+                Image(systemName: "checkmark")
+                    .font(.system(size: 25, weight: .bold))
+                    .foregroundColor(.white)
+            }
             
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(viewModel.item.title)
-                    .font(.headline)
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
                 
                 Text("タスク完了")
-                    .font(.subheadline)
+                    .font(.caption)
                     .foregroundColor(.secondary)
-                    .foregroundStyle(LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .leading, endPoint: .trailing))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color(UIColor.tertiarySystemBackground))
+                    .cornerRadius(6)
             }
             
             Spacer()
         }
-        .padding()
-        .background(Color(UIColor.secondarySystemBackground))
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 15)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color(UIColor.secondarySystemBackground))
+                .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 6)
+        )
     }
     
     private var timeComparisonView: some View {
-        HStack(spacing: 20) {
+        HStack(spacing: 18) {
             timeCard(title: "予測時間", time: viewModel.item.estimatedTime ?? 0, icon: "hourglass")
             timeCard(title: "実際の時間", time: viewModel.item.elapsedTime, icon: "stopwatch")
         }
@@ -71,30 +79,35 @@ struct TaskCompletionView: View {
     
     private func timeCard(title: String, time: Double, icon: String) -> some View {
         VStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 30))
-                .foregroundColor(.blue)
+            ZStack {
+                Circle()
+                    .fill(Color.blue)
+                    .frame(width: 44, height: 44)
+                
+                Image(systemName: icon)
+                    .font(.system(size: 22))
+                    .foregroundColor(.white)
+            }
             
             Text(viewModel.formatTime(time))
                 .font(.system(size: 24, weight: .bold, design: .rounded))
+                .foregroundColor(.primary)
             
             Text(title)
-                .font(.caption)
+                .font(.subheadline)
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding()
-        .background(LinearGradient(gradient: Gradient(colors: [Color(UIColor.secondarySystemBackground), Color(UIColor.systemBackground)]), startPoint: .topLeading, endPoint: .bottomTrailing))
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.blue.opacity(0.5), lineWidth: 2)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color(UIColor.tertiarySystemBackground))
+                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
         )
-        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
     }
     
     private var metricsView: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 18) {
             ForEach(viewModel.detailedMetrics, id: \.title) { metric in
                 metricCard(metric: metric)
             }
@@ -105,36 +118,42 @@ struct TaskCompletionView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: iconForMetric(metric.title))
-                    .font(.system(size: 24))
-                    .foregroundColor(metric.color)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 35, height: 35)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(metric.color)
+                    )
                 
-                Text(metric.title)
-                    .font(.headline)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(metric.title)
+                        .font(.headline)
+                    
+                    Text(String(format: "%.1f", metric.value))
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .foregroundColor(metric.color)
+                }
                 
                 Spacer()
-                
-                Text(String(format: "%.1f", metric.value))
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundColor(metric.color)
             }
             
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 8) {
                 ProgressView(value: viewModel.normalizedValue(for: metric.value, title: metric.title))
-                    .progressViewStyle(ThickProgressViewStyle(color: metric.color))
+                    .progressViewStyle(SimpleProgressViewStyle(color: metric.color))
                 
                 Text(metric.description)
                     .font(.caption)
                     .foregroundColor(.secondary)
-                    .padding(.top, 4)
             }
         }
-        .padding()
-        .background(LinearGradient(gradient: Gradient(colors: [Color(UIColor.secondarySystemBackground), Color(UIColor.systemBackground)]), startPoint: .topLeading, endPoint: .bottomTrailing))
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
-        .offset(y: animateMetricCards ? 0 : 50)
-        .opacity(animateMetricCards ? 1.0 : 0.0)
-        .animation(.easeOut(duration: 0.7).delay(0.4), value: animateMetricCards)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 15)
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color(UIColor.secondarySystemBackground))
+                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+        )
     }
     
     private func iconForMetric(_ title: String) -> String {
@@ -151,22 +170,22 @@ struct TaskCompletionView: View {
     }
 }
 
-struct ThickProgressViewStyle: ProgressViewStyle {
+struct SimpleProgressViewStyle: ProgressViewStyle {
     var color: Color
     
     func makeBody(configuration: Configuration) -> some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: geometry.size.height / 2)
+                    .fill(color.opacity(0.2))
                     .frame(height: geometry.size.height)
-                    .foregroundColor(color.opacity(0.3))
                 
                 RoundedRectangle(cornerRadius: geometry.size.height / 2)
+                    .fill(color)
                     .frame(width: CGFloat(configuration.fractionCompleted ?? 0) * geometry.size.width, height: geometry.size.height)
-                    .foregroundColor(color)
             }
         }
-        .frame(height: 12)  // バーの厚みを設定
+        .frame(height: 10)
     }
 }
 
@@ -178,11 +197,11 @@ struct TaskCompletionView_Previews: PreviewProvider {
             dueDate: Date().timeIntervalSince1970,
             createdDate: Date().timeIntervalSince1970,
             isDone: true,
-            estimatedTime: 2.0,  // 2時間
+            estimatedTime: 2.0,
             progress: 1.0,
             lastUpdated: Date().timeIntervalSince1970,
             actualTime: nil,
-            elapsedTime: 5400  // 1時間30分（秒単位）
+            elapsedTime: 5400
         )
         
         let viewModel = TaskCompletionViewModel(item: sampleItem)
