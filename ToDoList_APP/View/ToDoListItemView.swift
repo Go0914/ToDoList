@@ -16,47 +16,13 @@ struct ToDoListItemView: View {
     var body: some View {
         ZStack {
             itemContent
-            
-            if showCompletionView {
-                Color.black.opacity(0.4)
-                    .edgesIgnoringSafeArea(.all)
-                    .onTapGesture {
-                        withAnimation(.spring()) {
-                            showCompletionView = false
-                        }
-                    }
-                
-                VStack {
-                    TaskCompletionView(viewModel: TaskCompletionViewModel(item: item))
-                        .transition(.scale.combined(with: .opacity))
-                        .zIndex(1)
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        withAnimation(.spring()) {
-                            showCompletionView = false
-                        }
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.white)
-                            .font(.title)
-                            .padding()
-                            .background(Color.appleBlue.opacity(0.8))
-                            .clipShape(Circle())
-                    }
-                }
-                .padding()
-            }
+        }
+        .sheet(isPresented: $showCompletionView) {
+            TaskCompletionView(viewModel: TaskCompletionViewModel(item: item))
         }
         .animation(.spring(), value: showCompletionView)
-        .onAppear {
-            viewModel.setCurrentItem(item)
-        }
-        .onChange(of: viewModel.currentItem?.elapsedTime) { _ in
-            if let updatedItem = viewModel.currentItem {
-                item = updatedItem
-            }
+        .onChange(of: viewModel.item.elapsedTime) { _ in
+            item = viewModel.item
         }
         .onChange(of: item.isDone) { isDone in
             if isDone {
@@ -150,10 +116,8 @@ struct ToDoListItemView: View {
     }
     
     private func toggleItemCompletion() {
-        viewModel.toggleIsDone(item: item)
-        if let updatedItem = viewModel.currentItem {
-            item = updatedItem
-        }
+        viewModel.toggleIsDone()
+        item = viewModel.item
     }
     
     var ringColor: Color {
@@ -168,5 +132,19 @@ struct ToDoListItemView: View {
             return "\(minutes)min"
         }
         return "\(hours)h\(minutes)min"
+    }
+}
+
+struct ToDoListItemView_Previews: PreviewProvider {
+    static var previews: some View {
+        let sampleItem = ToDoListItem(
+            id: UUID().uuidString,
+            title: "Sample Task",
+            dueDate: Date().timeIntervalSince1970,
+            createdDate: Date().timeIntervalSince1970,
+            isDone: false,
+            estimatedTime: 1.5
+        )
+        ToDoListItemView(item: sampleItem)
     }
 }

@@ -45,7 +45,7 @@ struct ProgressiveRingTimerView: View {
                     // Start/Stop button
                     Button(action: {
                         if viewModel.isRunning {
-                            viewModel.stopTimer()
+                            viewModel.pauseTimer()
                         } else {
                             viewModel.startTimer()
                         }

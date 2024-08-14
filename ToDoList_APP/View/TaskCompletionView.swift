@@ -6,7 +6,7 @@ struct TaskCompletionView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
+            VStack(spacing: 20) {
                 headerView
                 timeComparisonView
                 metricsView
@@ -19,7 +19,7 @@ struct TaskCompletionView: View {
     private var headerView: some View {
         HStack(spacing: 16) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 36))
+                .font(.system(size: 40))
                 .foregroundColor(.green)
             
             VStack(alignment: .leading, spacing: 4) {
@@ -30,16 +30,18 @@ struct TaskCompletionView: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
+            
+            Spacer()
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(Color(UIColor.secondarySystemBackground))
-        .cornerRadius(12)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
     private var timeComparisonView: some View {
         HStack(spacing: 20) {
-            timeCard(title: "予測時間", time: viewModel.item.estimatedTime ?? 0, icon: "clock")
+            timeCard(title: "予測時間", time: viewModel.item.estimatedTime ?? 0, icon: "hourglass")
             timeCard(title: "実際の時間", time: viewModel.item.elapsedTime, icon: "stopwatch")
         }
     }
@@ -61,7 +63,10 @@ struct TaskCompletionView: View {
         .padding()
         .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.blue.opacity(0.5), lineWidth: 2)
+        )
     }
     
     private var metricsView: some View {
@@ -99,13 +104,13 @@ struct TaskCompletionView: View {
         .padding()
         .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
     private func iconForMetric(_ title: String) -> String {
         switch title {
         case "予測精度":
-            return "chart.bar.fill"
+            return "scope"
         case "効率指数":
             return "speedometer"
         case "時間節約":

@@ -3,43 +3,80 @@ import FirebaseFirestore
 import Foundation
 
 class ToDoListItemViewViewModel: ObservableObject {
-    @Published var currentItem: ToDoListItem?
-    var timerViewModel: ProgressiveRingTimerViewModel?
-
+    @Published var item: ToDoListItem
+    @Published var timerViewModel: ProgressiveRingTimerViewModel?
+    
     init(item: ToDoListItem) {
-        self.currentItem = item
+        self.item = item
         self.timerViewModel = ProgressiveRingTimerViewModel(estimatedTime: item.estimatedTime)
+        self.timerViewModel?.elapsedTime = item.elapsedTime
+        self.timerViewModel?.updateTimerState(item.timerState)
     }
+    
+    
+    //以下の部分から始める。とくにtoggleIsDoneの部分や、ProgressiveRingTimerViewModelで定義したもの定義されていたものに対して必要、不必要性をもっと考えないといけない。currentItemの定義箇所も判断必要。
+    
+    func toggleTimer() {
+        if let isRunning = timerViewModel?.isRunning, isRunning {
+            timerViewModel?.pauseTimer()
+            item.timerState = .paused
+        } else {
+            timerViewModel?.startTimer()
+            item.timerState = .running
+        }
+        //まだわからない
+        //updateFirestore(item: item)
+    }
+    
+    
+//必要性の議論の余地あり
+    func toggleIsDone() {
+        let previousState = item.isDone
+        item.isDone.toggle()
 
-    func toggleIsDone(item: ToDoListItem) {
-        var itemCopy = item
-        let previousState = itemCopy.isDone
-        itemCopy.isDone.toggle()
-        
-        if itemCopy.isDone && !previousState {
-            // タスク完了時の処理
+        if item.isDone && !previousState {
             if let elapsedTime = timerViewModel?.elapsedTime {
-                itemCopy.elapsedTime = elapsedTime
+                item.elapsedTime = elapsedTime
             }
             let (_, isOvertime) = timerViewModel?.completeTask() ?? (0, false)
-            itemCopy.calculateMetrics(isOvertime: isOvertime)
-        } else if !itemCopy.isDone && previousState {
-            // タスクを未完了に戻す処理
-            // タイマーはリセットせず、経過時間を保持
-            itemCopy.predictionAccuracy = nil
-            itemCopy.efficiencyIndex = nil
-            itemCopy.timeSavingAchievement = nil
+            item.calculateMetrics(isOvertime: isOvertime)
+        } else if !item.isDone && previousState {
+            item.predictionAccuracy = nil
+            item.efficiencyIndex = nil
+            item.timeSavingAchievement = nil
         }
-        
-        self.currentItem = itemCopy  // 即座にcurrentItemを更新
-        updateFirestore(item: itemCopy)
+
+        updateFirestore(item: item)
     }
 
+    
+    func completeTask() {
+        if let timerViewModel = timerViewModel {
+            let result = timerViewModel.completeTask()
+            item.isDone = true
+            item.timerState = .completed
+            item.elapsedTime = result.elapsedTime
+            item.actualTime = result.elapsedTime
+            calculateMetrics(isOvertime: result.isOvertime)
+            updateFirestore(item: item) //議論の余地あり
+        } else {
+            // timerViewModelがnilの場合の処理が必要であれば、ここで対応
+            print("ToDoListItemViewViewModelのcompleteTaskでエラーだよ")
+        }
+    }
+    
+    private func calculateMetrics(isOvertime: Bool) {
+        guard let estimatedTime = item.estimatedTime else { return }
+        let estimatedTimeInSeconds = estimatedTime * 3600
+        item.predictionAccuracy = max(0, min(100, 100 - abs(item.elapsedTime - estimatedTimeInSeconds) / estimatedTimeInSeconds * 100))
+        item.efficiencyIndex = max(0.1, min(5, item.elapsedTime / estimatedTimeInSeconds))
+        item.timeSavingAchievement = max(-400, min(100, (estimatedTimeInSeconds - item.elapsedTime) / estimatedTimeInSeconds * 100))
+    }
+    
+
     func updateElapsedTime() {
-        guard var item = currentItem else { return }
         if let elapsedTime = timerViewModel?.elapsedTime {
             item.elapsedTime = elapsedTime
-            currentItem = item
             updateFirestore(item: item)
         }
     }
@@ -56,29 +93,11 @@ class ToDoListItemViewViewModel: ObservableObject {
             "timeSavingAchievement": item.timeSavingAchievement ?? NSNull()
         ]) { error in
             if let error = error {
-                print("Firestore update error: \(error)")
-            } else {
-                self.currentItem = item
+                print("Firestore update error: \\(error)")
             }
         }
     }
 
-    func startTimer() {
-        timerViewModel?.startTimer()
-    }
-
-    func stopTimer() {
-        timerViewModel?.stopTimer()
-        updateElapsedTime()
-    }
-
-    func setCurrentItem(_ item: ToDoListItem) {
-        currentItem = item
-        timerViewModel = ProgressiveRingTimerViewModel(estimatedTime: item.estimatedTime)
-        if let elapsedTime = currentItem?.elapsedTime {
-            timerViewModel?.elapsedTime = elapsedTime
-        }
-    }
     
     func generateFeedbackMessage(for item: ToDoListItem) -> String {
         guard let efficiency = item.efficiencyIndex else {
@@ -95,7 +114,7 @@ class ToDoListItemViewViewModel: ObservableObject {
     }
 
     func deleteItem() {
-        guard let item = currentItem, let uid = Auth.auth().currentUser?.uid else { return }
+        guard let uid = Auth.auth().currentUser?.uid else { return }
         let db = Firestore.firestore()
         db.collection("users").document(uid).collection("todos").document(item.id).delete { error in
             if let error = error {
