@@ -3,13 +3,35 @@ import SwiftUI
 struct TaskCompletionView: View {
     @ObservedObject var viewModel: TaskCompletionViewModel
     @Environment(\.colorScheme) var colorScheme
+    @State private var animateCheckmark = false
+    @State private var animateTimeCards = false
+    @State private var animateMetricCards = false
     
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
                 headerView
+                    .scaleEffect(animateCheckmark ? 1.2 : 0.8)
+                    .animation(.interpolatingSpring(stiffness: 70, damping: 10).delay(0.1), value: animateCheckmark)
+                    .onAppear {
+                        animateCheckmark = true
+                    }
+                
                 timeComparisonView
+                    .scaleEffect(animateTimeCards ? 1.0 : 0.5)
+                    .opacity(animateTimeCards ? 1.0 : 0.0)
+                    .animation(.easeOut(duration: 0.6).delay(0.2), value: animateTimeCards)
+                    .onAppear {
+                        animateTimeCards = true
+                    }
+                
                 metricsView
+                    .offset(y: animateMetricCards ? 0 : 50)
+                    .opacity(animateMetricCards ? 1.0 : 0.0)
+                    .animation(.easeOut(duration: 0.7).delay(0.4), value: animateMetricCards)
+                    .onAppear {
+                        animateMetricCards = true
+                    }
             }
             .padding()
         }
@@ -29,6 +51,7 @@ struct TaskCompletionView: View {
                 Text("タスク完了")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
+                    .foregroundStyle(LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .leading, endPoint: .trailing))
             }
             
             Spacer()
@@ -36,7 +59,7 @@ struct TaskCompletionView: View {
         .padding()
         .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 5)
     }
     
     private var timeComparisonView: some View {
@@ -61,12 +84,13 @@ struct TaskCompletionView: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color(UIColor.secondarySystemBackground))
+        .background(LinearGradient(gradient: Gradient(colors: [Color(UIColor.secondarySystemBackground), Color(UIColor.systemBackground)]), startPoint: .topLeading, endPoint: .bottomTrailing))
         .cornerRadius(16)
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Color.blue.opacity(0.5), lineWidth: 2)
         )
+        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
     }
     
     private var metricsView: some View {
@@ -94,17 +118,23 @@ struct TaskCompletionView: View {
                     .foregroundColor(metric.color)
             }
             
-            ProgressView(value: viewModel.normalizedValue(for: metric.value, title: metric.title))
-                .progressViewStyle(LinearProgressViewStyle(tint: metric.color))
-            
-            Text(metric.description)
-                .font(.caption)
-                .foregroundColor(.secondary)
+            VStack(alignment: .leading) {
+                ProgressView(value: viewModel.normalizedValue(for: metric.value, title: metric.title))
+                    .progressViewStyle(ThickProgressViewStyle(color: metric.color))
+                
+                Text(metric.description)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 4)
+            }
         }
         .padding()
-        .background(Color(UIColor.secondarySystemBackground))
+        .background(LinearGradient(gradient: Gradient(colors: [Color(UIColor.secondarySystemBackground), Color(UIColor.systemBackground)]), startPoint: .topLeading, endPoint: .bottomTrailing))
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
+        .offset(y: animateMetricCards ? 0 : 50)
+        .opacity(animateMetricCards ? 1.0 : 0.0)
+        .animation(.easeOut(duration: 0.7).delay(0.4), value: animateMetricCards)
     }
     
     private func iconForMetric(_ title: String) -> String {
@@ -118,6 +148,25 @@ struct TaskCompletionView: View {
         default:
             return "questionmark.circle"
         }
+    }
+}
+
+struct ThickProgressViewStyle: ProgressViewStyle {
+    var color: Color
+    
+    func makeBody(configuration: Configuration) -> some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: geometry.size.height / 2)
+                    .frame(height: geometry.size.height)
+                    .foregroundColor(color.opacity(0.3))
+                
+                RoundedRectangle(cornerRadius: geometry.size.height / 2)
+                    .frame(width: CGFloat(configuration.fractionCompleted ?? 0) * geometry.size.width, height: geometry.size.height)
+                    .foregroundColor(color)
+            }
+        }
+        .frame(height: 12)  // バーの厚みを設定
     }
 }
 
