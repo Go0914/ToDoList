@@ -65,13 +65,17 @@ struct NewItemView: View {
             
             TextField("Enter task title", text: $viewModel.title)
                 .padding()
-                .background(colorScheme == .dark ? Color(.systemGray6) : .white)
+                .background(
+                    LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.15), Color.purple.opacity(0.15)]),
+                                   startPoint: .topLeading,
+                                   endPoint: .bottomTrailing)
+                )
                 .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(isTitleFocused ? Color.blue : Color(.systemGray4), lineWidth: 2)
                 )
-                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                .shadow(color: Color.blue.opacity(isTitleFocused ? 0.3 : 0.05), radius: 10, x: 0, y: 5)
                 .focused($isTitleFocused)
             
             Text("Task title is required")
@@ -83,7 +87,6 @@ struct NewItemView: View {
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(colorScheme == .dark ? Color(.systemGray5) : .white)
-                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
         )
         .padding(.horizontal)
     }
@@ -151,6 +154,12 @@ struct NewItemView: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(colorScheme == .dark ? Color(.systemGray5) : .white)
                 .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.blue, lineWidth: 1)
+                )
+
+            
         )
         .padding(.horizontal)
     }
@@ -179,7 +188,6 @@ struct NewItemView: View {
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(Color.orange, lineWidth: viewModel.estimatedTimeIndex == index ? 0 : 1)
                             )
-                            .shadow(color: Color.black.opacity(viewModel.estimatedTimeIndex == index ? 0.1 : 0), radius: 5, x: 0, y: 2)
                     }
                 }
             }
@@ -188,7 +196,10 @@ struct NewItemView: View {
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(colorScheme == .dark ? Color(.systemGray5) : .white)
-                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.orange, lineWidth: 1)
+                )
         )
         .padding(.horizontal)
     }

@@ -37,9 +37,9 @@ struct TaskCompletionView: View {
         HStack(spacing: 18) {
             ZStack {
                 Circle()
-                    .fill(Color.green)
+                    .fill(Color.green.opacity(0.8))
                     .frame(width: 50, height: 50)
-                    .shadow(color: Color.green.opacity(0.3), radius: 8, x: 0, y: 3)
+                    .shadow(color: Color.green.opacity(0.2), radius: 8, x: 0, y: 3)
                 
                 Image(systemName: "checkmark")
                     .font(.system(size: 25, weight: .bold))
@@ -49,6 +49,7 @@ struct TaskCompletionView: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(viewModel.item.title)
                     .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundColor(.primary)
                 
                 Text("タスク完了")
                     .font(.caption)
@@ -72,16 +73,16 @@ struct TaskCompletionView: View {
     
     private var timeComparisonView: some View {
         HStack(spacing: 18) {
-            timeCard(title: "予測時間", time: viewModel.item.estimatedTime ?? 0, icon: "hourglass")
-            timeCard(title: "実際の時間", time: viewModel.item.elapsedTime, icon: "stopwatch")
+            timeCard(title: "予測時間", time: viewModel.item.estimatedTime ?? 0, icon: "hourglass", color: .blue.opacity(0.8))
+            timeCard(title: "実際の時間", time: viewModel.item.elapsedTime, icon: "stopwatch", color: .orange.opacity(0.8))
         }
     }
     
-    private func timeCard(title: String, time: Double, icon: String) -> some View {
+    private func timeCard(title: String, time: Double, icon: String, color: Color) -> some View {
         VStack(spacing: 12) {
             ZStack {
                 Circle()
-                    .fill(Color.blue)
+                    .fill(color)
                     .frame(width: 44, height: 44)
                 
                 Image(systemName: icon)
@@ -123,16 +124,17 @@ struct TaskCompletionView: View {
                     .frame(width: 35, height: 35)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
-                            .fill(metric.color)
+                            .fill(metric.color.opacity(0.8))
                     )
                 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(metric.title)
                         .font(.headline)
+                        .foregroundColor(.primary)
                     
                     Text(String(format: "%.1f", metric.value))
                         .font(.system(size: 22, weight: .bold, design: .rounded))
-                        .foregroundColor(metric.color)
+                        .foregroundColor(metric.color.opacity(0.8))
                 }
                 
                 Spacer()
@@ -140,7 +142,7 @@ struct TaskCompletionView: View {
             
             VStack(alignment: .leading, spacing: 8) {
                 ProgressView(value: viewModel.normalizedValue(for: metric.value, title: metric.title))
-                    .progressViewStyle(SimpleProgressViewStyle(color: metric.color))
+                    .progressViewStyle(SimpleProgressViewStyle(color: metric.color.opacity(0.8)))
                 
                 Text(metric.description)
                     .font(.caption)

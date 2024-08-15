@@ -29,7 +29,7 @@ struct ToDoListItemView: View {
         }) {
             if let timerViewModel = viewModel.timerViewModel {
                 ProgressiveRingTimerView(viewModel: timerViewModel, color: ringColor)
-                    .frame(width: 300, height: 300) // ここでリングサイズを指定します
+                    .frame(width: 300, height: 300)
             }
         }
         .onChange(of: viewModel.timerViewModel?.isRunning) { isRunning in
@@ -74,10 +74,10 @@ struct ToDoListItemView: View {
     private var itemContent: some View {
         RoundedRectangle(cornerRadius: 16)
             .fill(item.isDone ? Color(.systemGray6) : Color(.systemBackground))
-            .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+            .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.appleBlue.opacity(0.2), lineWidth: 1)
+                    .stroke(Color.purple.opacity(0.3), lineWidth: 1)
             )
             .frame(height: 110)
             .overlay(
@@ -113,15 +113,15 @@ struct ToDoListItemView: View {
         }) {
             ZStack {
                 Circle()
-                    .fill(Color.appleBlue.opacity(0.1))
+                    .fill(Color.teal.opacity(0.2))
                     .frame(width: 44, height: 44)
                 
                 Image(systemName: "play.fill")
                     .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.appleBlue)
+                    .foregroundColor(.teal)
             }
             .opacity(isBlinking ? 0.6 : 1.0)
-            .shadow(color: .appleBlue.opacity(0.3), radius: isBlinking ? 8 : 0)
+            .shadow(color: .teal.opacity(0.4), radius: isBlinking ? 8 : 0)
         }
         .animation(isBlinking ? .easeInOut(duration: 0.6).repeatForever(autoreverses: true) : .default, value: isBlinking)
     }
@@ -130,7 +130,7 @@ struct ToDoListItemView: View {
         HStack(spacing: 4) {
             Image(systemName: "calendar")
                 .font(.system(size: 12))
-                .foregroundColor(.appleBlue)
+                .foregroundColor(.orange)
             Text(Date(timeIntervalSince1970: item.dueDate).formatted(.dateTime.month(.defaultDigits).day(.defaultDigits)))
                 .font(.system(size: 13))
                 .foregroundColor(.secondary)
@@ -144,10 +144,10 @@ struct ToDoListItemView: View {
             Text(formattedTime(from: time))
                 .font(.system(size: 13))
         }
-        .foregroundColor(.appleBlue)
+        .foregroundColor(.purple)
         .padding(.vertical, 2)
         .padding(.horizontal, 6)
-        .background(Color.appleBlue.opacity(0.1))
+        .background(Color.purple.opacity(0.1))
         .cornerRadius(6)
     }
 
@@ -155,7 +155,7 @@ struct ToDoListItemView: View {
         Button(action: toggleItemCompletion) {
             Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
                 .font(.system(size: 26, weight: .semibold))
-                .foregroundColor(item.isDone ? .appleLightBlue : .appleBlue)
+                .foregroundColor(item.isDone ? .green : .teal)
         }
         .frame(width: 44, height: 44)
         .contentShape(Rectangle())
@@ -168,7 +168,7 @@ struct ToDoListItemView: View {
     }
 
     var ringColor: Color {
-        item.isDone ? .appleLightBlue : .appleBlue
+        item.isDone ? .green : .teal
     }
 
     func formattedTime(from time: Double) -> String {

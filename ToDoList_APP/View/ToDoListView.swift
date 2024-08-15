@@ -17,13 +17,32 @@ struct ToDoListView: View {
                 Color(.systemBackground).ignoresSafeArea()
                 
                 VStack(spacing: 16) {
-                    // スタイリッシュなタブビュー
-                    Picker("", selection: $selectedTab) {
-                        Text("All").tag(0)
-                        Text("Completed").tag(1)
+                    // カラフルなタブバー
+                    HStack(spacing: 20) {
+                        TabButton(title: "All", isSelected: selectedTab == 0, color: .blue) {
+                            withAnimation(.spring()) {
+                                selectedTab = 0
+                            }
+                        }
+                        TabButton(title: "Completed", isSelected: selectedTab == 1, color: .orange) {
+                            withAnimation(.spring()) {
+                                selectedTab = 1
+                            }
+                        }
                     }
-                    .pickerStyle(SegmentedPickerStyle())
                     .padding(.horizontal)
+                    
+                    // アンダーライン
+                    HStack {
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(selectedTab == 0 ? Color.blue : Color.orange)
+                            .frame(height: 4)
+                            .frame(maxWidth: .infinity)
+                            .offset(x: selectedTab == 0 ? -UIScreen.main.bounds.width / 4 : UIScreen.main.bounds.width / 4)
+                    }
+                    .frame(height: 4)
+                    .padding(.top, -8)
+                    .animation(.spring(), value: selectedTab)
                     
                     // タスクリスト
                     ScrollView {
@@ -31,30 +50,35 @@ struct ToDoListView: View {
                             ForEach(filteredItems) { item in
                                 ToDoListItemView(item: item)
                                     .cornerRadius(10)
+                                    .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10)
+                                            .stroke(item.isDone ? Color.green : Color.purple, lineWidth: 2)
+                                    )
                             }
                         }
                         .padding(.horizontal)
                     }
                 }
             }
-            .navigationTitle("Tasks")
-            .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: { showProfile.toggle() }) {
                         Image(systemName: "person.crop.circle")
-                            .foregroundColor(.appleBlue)
+                            .foregroundColor(.red)
+                            .font(.title2)
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { viewModel.showingNewItemView = true }) {
-                        Image(systemName: "plus")
-                            .foregroundColor(.appleBlue)
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(.yellow)
+                            .font(.title2)
                     }
                 }
             }
         }
-        .accentColor(.appleBlue)
+        .accentColor(.purple)
         .sheet(isPresented: $viewModel.showingNewItemView) {
             NewItemView(newItemPresented: $viewModel.showingNewItemView, toDoListViewModel: viewModel)
         }
@@ -75,14 +99,11 @@ struct ToDoListView: View {
         let sortedItems = viewModel.items.sorted { item1, item2 in
             if item1.isDone == item2.isDone {
                 if item1.isDone {
-                    // 完了したタスクは完了日時の逆順（最近完了したものが先）
                     return item1.lastUpdated > item2.lastUpdated
                 } else {
-                    // 未完了のタスクは期日順（期日が近いものが先）
                     return item1.dueDate < item2.dueDate
                 }
             }
-            // 未完了のタスクを先に、完了したタスクを後ろに
             return !item1.isDone && item2.isDone
         }
         
@@ -90,6 +111,26 @@ struct ToDoListView: View {
         case 0: return sortedItems // All tasks
         case 1: return sortedItems.filter { $0.isDone } // Completed tasks only
         default: return sortedItems
+        }
+    }
+}
+
+struct TabButton: View {
+    let title: String
+    let isSelected: Bool
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(isSelected ? color : .gray)
+                .padding(.vertical, 10)
+                .frame(maxWidth: .infinity)
+                .background(isSelected ? color.opacity(0.1) : Color.clear)
+                .cornerRadius(10)
+                .shadow(color: isSelected ? color.opacity(0.3) : Color.clear, radius: 5, x: 0, y: 2)
         }
     }
 }
