@@ -72,25 +72,26 @@ struct ToDoListItemView: View {
     }
 
     private var itemContent: some View {
-        RoundedRectangle(cornerRadius: 16)
-            .fill(item.isDone ? Color(.systemGray6) : Color(.systemBackground))
-            .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
+        RoundedRectangle(cornerRadius: 15)
+            .fill(item.isDone ? Color(red: 0.97, green: 0.97, blue: 0.97) : Color.white)
+            .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 3)
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.purple.opacity(0.3), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 15)
+                    .stroke(isBlinking ? Color.orange.opacity(0.5) : Color.blue.opacity(0.2), lineWidth: 1.5)
+                    .animation(isBlinking ? .easeInOut(duration: 0.6).repeatForever(autoreverses: true) : .default, value: isBlinking)
             )
-            .frame(height: 110)
+            .frame(height: 90)
             .overlay(
-                HStack(spacing: 16) {
+                HStack(spacing: 12) {
                     startButton
                     
-                    VStack(alignment: .leading, spacing: 6) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(item.title)
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.system(size: 14, weight: .medium, design: .rounded))
                             .foregroundColor(.primary)
                             .lineLimit(1)
 
-                        HStack(spacing: 12) {
+                        HStack(spacing: 8) {
                             dateView
                             if let estimatedTime = item.estimatedTime {
                                 estimatedTimeView(estimatedTime)
@@ -102,8 +103,8 @@ struct ToDoListItemView: View {
 
                     completionButton
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
             )
     }
 
@@ -113,15 +114,15 @@ struct ToDoListItemView: View {
         }) {
             ZStack {
                 Circle()
-                    .fill(Color.teal.opacity(0.2))
-                    .frame(width: 44, height: 44)
+                    .fill(Color.blue.opacity(0.2))
+                    .frame(width: 40, height: 40)
                 
                 Image(systemName: "play.fill")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.teal)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.blue)
             }
-            .opacity(isBlinking ? 0.6 : 1.0)
-            .shadow(color: .teal.opacity(0.4), radius: isBlinking ? 8 : 0)
+            .opacity(isBlinking ? 0.7 : 1.0)
+            .shadow(color: .blue.opacity(0.3), radius: isBlinking ? 8 : 0)
         }
         .animation(isBlinking ? .easeInOut(duration: 0.6).repeatForever(autoreverses: true) : .default, value: isBlinking)
     }
@@ -132,7 +133,7 @@ struct ToDoListItemView: View {
                 .font(.system(size: 12))
                 .foregroundColor(.orange)
             Text(Date(timeIntervalSince1970: item.dueDate).formatted(.dateTime.month(.defaultDigits).day(.defaultDigits)))
-                .font(.system(size: 13))
+                .font(.system(size: 12, design: .rounded))
                 .foregroundColor(.secondary)
         }
     }
@@ -142,22 +143,22 @@ struct ToDoListItemView: View {
             Image(systemName: "clock")
                 .font(.system(size: 12))
             Text(formattedTime(from: time))
-                .font(.system(size: 13))
+                .font(.system(size: 12, design: .rounded))
         }
-        .foregroundColor(.purple)
+        .foregroundColor(.green)
         .padding(.vertical, 2)
         .padding(.horizontal, 6)
-        .background(Color.purple.opacity(0.1))
+        .background(Color.green.opacity(0.1))
         .cornerRadius(6)
     }
 
     private var completionButton: some View {
         Button(action: toggleItemCompletion) {
             Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
-                .font(.system(size: 26, weight: .semibold))
-                .foregroundColor(item.isDone ? .green : .teal)
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(item.isDone ? .green : .pink)
         }
-        .frame(width: 44, height: 44)
+        .frame(width: 40, height: 40)
         .contentShape(Rectangle())
     }
 
@@ -168,7 +169,7 @@ struct ToDoListItemView: View {
     }
 
     var ringColor: Color {
-        item.isDone ? .green : .teal
+        item.isDone ? .green : .blue
     }
 
     func formattedTime(from time: Double) -> String {

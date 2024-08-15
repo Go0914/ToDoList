@@ -14,46 +14,48 @@ struct ToDoListView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                Color(.systemBackground).ignoresSafeArea()
+                // 背景にさらに薄いグラデーションを追加
+                LinearGradient(gradient: Gradient(colors: [Color(red: 1.0, green: 0.98, blue: 0.95), Color(red: 0.98, green: 0.92, blue: 0.88)]),
+                               startPoint: .topLeading,
+                               endPoint: .bottomTrailing)
+                    .ignoresSafeArea()
                 
-                VStack(spacing: 16) {
-                    // カラフルなタブバー
-                    HStack(spacing: 20) {
-                        TabButton(title: "All", isSelected: selectedTab == 0, color: .blue) {
-                            withAnimation(.spring()) {
+                VStack(spacing: 12) {
+                    // 柔らかいタブバー
+                    HStack(spacing: 15) {
+                        TabButton(title: "All", isSelected: selectedTab == 0, color: Color(red: 0.8, green: 0.7, blue: 0.6)) {
+                            withAnimation(.easeInOut(duration: 0.3)) {
                                 selectedTab = 0
                             }
                         }
-                        TabButton(title: "Completed", isSelected: selectedTab == 1, color: .orange) {
-                            withAnimation(.spring()) {
+                        TabButton(title: "Completed", isSelected: selectedTab == 1, color: Color(red: 0.9, green: 0.7, blue: 0.6)) {
+                            withAnimation(.easeInOut(duration: 0.3)) {
                                 selectedTab = 1
                             }
                         }
                     }
                     .padding(.horizontal)
-                    
-                    // アンダーライン
-                    HStack {
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(selectedTab == 0 ? Color.blue : Color.orange)
-                            .frame(height: 4)
-                            .frame(maxWidth: .infinity)
-                            .offset(x: selectedTab == 0 ? -UIScreen.main.bounds.width / 4 : UIScreen.main.bounds.width / 4)
-                    }
-                    .frame(height: 4)
-                    .padding(.top, -8)
-                    .animation(.spring(), value: selectedTab)
+                    .background(Color.white.opacity(0.5))
+                    .cornerRadius(12)
+                    .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                     
                     // タスクリスト
                     ScrollView {
                         LazyVStack(spacing: 12) {
                             ForEach(filteredItems) { item in
                                 ToDoListItemView(item: item)
-                                    .cornerRadius(10)
-                                    .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 3)
+                                    .cornerRadius(25)
+                                    .shadow(color: Color.black.opacity(0.05), radius: 6, x: 0, y: 3)
+                                    .background(
+                                        LinearGradient(gradient: Gradient(colors: [Color.white, Color(red: 1.0, green: 0.98, blue: 0.95)]),
+                                                       startPoint: .topLeading,
+                                                       endPoint: .bottomTrailing)
+                                            .cornerRadius(25)
+                                            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                                    )
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .stroke(item.isDone ? Color.green : Color.purple, lineWidth: 2)
+                                        RoundedRectangle(cornerRadius: 25)
+                                            .stroke(item.isDone ? Color(red: 0.85, green: 0.9, blue: 0.8) : Color(red: 0.9, green: 0.8, blue: 0.7), lineWidth: 1.5)
                                     )
                             }
                         }
@@ -65,20 +67,24 @@ struct ToDoListView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: { showProfile.toggle() }) {
                         Image(systemName: "person.crop.circle")
-                            .foregroundColor(.red)
-                            .font(.title2)
+                            .resizable()
+                            .frame(width: 28, height: 28)
+                            .foregroundColor(Color(red: 0.9, green: 0.75, blue: 0.7))
+                            .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { viewModel.showingNewItemView = true }) {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(.yellow)
-                            .font(.title2)
+                        Image(systemName: "plus.circle")
+                            .resizable()
+                            .frame(width: 28, height: 28)
+                            .foregroundColor(Color(red: 0.9, green: 0.75, blue: 0.7))
+                            .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
                     }
                 }
             }
         }
-        .accentColor(.purple)
+        .accentColor(Color(red: 0.85, green: 0.6, blue: 0.5))
         .sheet(isPresented: $viewModel.showingNewItemView) {
             NewItemView(newItemPresented: $viewModel.showingNewItemView, toDoListViewModel: viewModel)
         }
@@ -124,13 +130,13 @@ struct TabButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(isSelected ? color : .gray)
-                .padding(.vertical, 10)
+                .font(.system(size: 16, weight: .medium, design: .rounded))
+                .foregroundColor(isSelected ? color : Color.primary)
+                .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
-                .background(isSelected ? color.opacity(0.1) : Color.clear)
+                .background(isSelected ? color.opacity(0.2) : Color.clear)
                 .cornerRadius(10)
-                .shadow(color: isSelected ? color.opacity(0.3) : Color.clear, radius: 5, x: 0, y: 2)
+                .shadow(color: isSelected ? color.opacity(0.2) : Color.clear, radius: 4, x: 0, y: 2)
         }
     }
 }

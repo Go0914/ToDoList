@@ -9,9 +9,9 @@ struct TaskCompletionView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 22) {
+            VStack(spacing: 20) {
                 headerView
-                    .scaleEffect(animateCheckmark ? 1.0 : 0.8)
+                    .scaleEffect(animateCheckmark ? 1.0 : 0.85)
                     .opacity(animateCheckmark ? 1.0 : 0.0)
                     .animation(.spring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.1).delay(0.1), value: animateCheckmark)
                     .onAppear { animateCheckmark = true }
@@ -30,51 +30,53 @@ struct TaskCompletionView: View {
             }
             .padding(.horizontal)
         }
-        .background(Color(UIColor.systemBackground))
+        .background(Color(UIColor.systemBackground).edgesIgnoringSafeArea(.all))
     }
     
     private var headerView: some View {
-        HStack(spacing: 18) {
+        HStack(spacing: 15) {
             ZStack {
                 Circle()
-                    .fill(Color.green.opacity(0.8))
-                    .frame(width: 50, height: 50)
-                    .shadow(color: Color.green.opacity(0.2), radius: 8, x: 0, y: 3)
+                    .fill(Color(red: 1.0, green: 0.8, blue: 0.6))
+                    .frame(width: 44, height: 44)
+                    .shadow(color: Color(red: 1.0, green: 0.8, blue: 0.6).opacity(0.3), radius: 7, x: 0, y: 3)
                 
                 Image(systemName: "checkmark")
-                    .font(.system(size: 25, weight: .bold))
+                    .font(.system(size: 22, weight: .bold))
                     .foregroundColor(.white)
             }
             
             VStack(alignment: .leading, spacing: 3) {
                 Text(viewModel.item.title)
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundColor(.primary)
                 
                 Text("タスク完了")
-                    .font(.caption)
+                    .font(.caption2)
                     .foregroundColor(.secondary)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
-                    .background(Color(UIColor.tertiarySystemBackground))
+                    .background(Color(red: 1.0, green: 0.9, blue: 0.7))
                     .cornerRadius(6)
             }
             
             Spacer()
         }
         .padding(.vertical, 12)
-        .padding(.horizontal, 15)
+        .padding(.horizontal, 16)
         .background(
             RoundedRectangle(cornerRadius: 18)
                 .fill(Color(UIColor.secondarySystemBackground))
-                .shadow(color: Color.black.opacity(0.08), radius: 12, x: 0, y: 6)
+                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
         )
     }
     
     private var timeComparisonView: some View {
-        HStack(spacing: 18) {
-            timeCard(title: "予測時間", time: viewModel.item.estimatedTime ?? 0, icon: "hourglass", color: .blue.opacity(0.8))
-            timeCard(title: "実際の時間", time: viewModel.item.elapsedTime, icon: "stopwatch", color: .orange.opacity(0.8))
+        HStack(spacing: 16) {
+            if let estimatedTime = viewModel.item.estimatedTime {
+                timeCard(title: "予測時間", time: estimatedTime, icon: "hourglass", color: Color(red: 1.0, green: 0.75, blue: 0.5))
+            }
+            timeCard(title: "実際の時間", time: viewModel.item.elapsedTime, icon: "stopwatch", color: Color(red: 0.5, green: 0.75, blue: 0.5))
         }
     }
     
@@ -83,32 +85,32 @@ struct TaskCompletionView: View {
             ZStack {
                 Circle()
                     .fill(color)
-                    .frame(width: 44, height: 44)
+                    .frame(width: 40, height: 40)
                 
                 Image(systemName: icon)
-                    .font(.system(size: 22))
+                    .font(.system(size: 20))
                     .foregroundColor(.white)
             }
             
             Text(viewModel.formatTime(time))
-                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .font(.system(size: 22, weight: .bold, design: .rounded))
                 .foregroundColor(.primary)
             
             Text(title)
-                .font(.subheadline)
+                .font(.footnote)
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 18)
-                .fill(Color(UIColor.tertiarySystemBackground))
-                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+                .fill(Color(UIColor.secondarySystemBackground))
+                .shadow(color: Color.black.opacity(0.1), radius: 7, x: 0, y: 4)
         )
     }
     
     private var metricsView: some View {
-        VStack(spacing: 18) {
+        VStack(spacing: 16) {
             ForEach(viewModel.detailedMetrics, id: \.title) { metric in
                 metricCard(metric: metric)
             }
@@ -119,9 +121,9 @@ struct TaskCompletionView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: iconForMetric(metric.title))
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.white)
-                    .frame(width: 35, height: 35)
+                    .frame(width: 32, height: 32)
                     .background(
                         RoundedRectangle(cornerRadius: 10)
                             .fill(metric.color.opacity(0.8))
@@ -129,32 +131,32 @@ struct TaskCompletionView: View {
                 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(metric.title)
-                        .font(.headline)
+                        .font(.subheadline)
                         .foregroundColor(.primary)
                     
-                    Text(String(format: "%.1f", metric.value))
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                    Text(String(format: "%.1f%%", metric.value))
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundColor(metric.color.opacity(0.8))
                 }
                 
                 Spacer()
             }
             
-            VStack(alignment: .leading, spacing: 8) {
-                ProgressView(value: viewModel.normalizedValue(for: metric.value, title: metric.title))
-                    .progressViewStyle(SimpleProgressViewStyle(color: metric.color.opacity(0.8)))
-                
-                Text(metric.description)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+            ProgressView(value: viewModel.normalizedValue(for: metric.value, title: metric.title))
+                .progressViewStyle(SimpleProgressViewStyle(color: metric.color.opacity(0.8)))
+            
+            Text(metric.message)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 4)
         }
         .padding(.vertical, 12)
-        .padding(.horizontal, 15)
+        .padding(.horizontal, 16)
         .background(
             RoundedRectangle(cornerRadius: 18)
                 .fill(Color(UIColor.secondarySystemBackground))
-                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+                .shadow(color: Color.black.opacity(0.1), radius: 7, x: 0, y: 4)
         )
     }
     
@@ -162,9 +164,9 @@ struct TaskCompletionView: View {
         switch title {
         case "予測精度":
             return "scope"
-        case "効率指数":
+        case "効率性指標":
             return "speedometer"
-        case "時間節約":
+        case "時間節約達成度":
             return "clock.arrow.circlepath"
         default:
             return "questionmark.circle"
@@ -187,7 +189,7 @@ struct SimpleProgressViewStyle: ProgressViewStyle {
                     .frame(width: CGFloat(configuration.fractionCompleted ?? 0) * geometry.size.width, height: geometry.size.height)
             }
         }
-        .frame(height: 10)
+        .frame(height: 8)
     }
 }
 
@@ -206,7 +208,12 @@ struct TaskCompletionView_Previews: PreviewProvider {
             elapsedTime: 5400
         )
         
-        let viewModel = TaskCompletionViewModel(item: sampleItem)
+        var updatedItem = sampleItem
+        updatedItem.efficiencyIndex = 0.9
+        updatedItem.timeSavingAchievement = 10
+        updatedItem.predictionAccuracy = 85
+        
+        let viewModel = TaskCompletionViewModel(item: updatedItem)
         
         return Group {
             TaskCompletionView(viewModel: viewModel)
