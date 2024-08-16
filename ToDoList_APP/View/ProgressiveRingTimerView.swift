@@ -6,41 +6,39 @@ struct ProgressiveRingTimerView: View {
 
     var body: some View {
         ZStack {
-            // Background circle with gradient
+            // Background circle with soft and pale gradient
             Circle()
                 .stroke(
                     LinearGradient(
-                        gradient: Gradient(colors: [Color(.systemGray6), Color(.systemGray4)]),
+                        gradient: Gradient(colors: [Color(.systemGray5).opacity(0.3), Color(.systemGray2).opacity(0.3)]),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ), lineWidth: 6)
-                .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
             
-            // Progress ring
+            // Progress ring with softer, pale color tones
             Circle()
                 .trim(from: 0, to: CGFloat(viewModel.progress.truncatingRemainder(dividingBy: 1)))
                 .stroke(
                     LinearGradient(
-                        gradient: Gradient(colors: [color.opacity(0.7), color]),
+                        gradient: Gradient(colors: [color.opacity(0.4), color.opacity(0.6)]),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
                     style: StrokeStyle(lineWidth: 6, lineCap: .round)
                 )
                 .rotationEffect(Angle(degrees: -90))
-                .shadow(color: color.opacity(0.3), radius: 4, x: 0, y: 4)
 
             VStack(spacing: 8) {
                 Text(timeString)
                     .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundColor(viewModel.isCountingUp ? .red : .primary)
+                    .foregroundColor(viewModel.isCountingUp ? .orange.opacity(0.8) : .primary)
                 
                 Text(progressString)
                     .font(.system(size: 14, weight: .medium, design: .rounded))
                     .foregroundColor(.secondary)
                 
                 HStack(spacing: 10) {
-                    // Reset button with shadow and gradient
+                    // Reset button with pale gradient
                     if !viewModel.isRunning {
                         Button(action: viewModel.resetTimer) {
                             Image(systemName: "arrow.counterclockwise")
@@ -49,19 +47,18 @@ struct ProgressiveRingTimerView: View {
                                 .frame(width: 28, height: 28)
                                 .background(
                                     LinearGradient(
-                                        gradient: Gradient(colors: [color.opacity(0.8), color]),
+                                        gradient: Gradient(colors: [color.opacity(0.5), color.opacity(0.7)]),
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     )
                                 )
                                 .clipShape(Circle())
-                                .shadow(color: color.opacity(0.5), radius: 5, x: 0, y: 4)
                         }
                         .buttonStyle(PlainButtonStyle())
                         .transition(.opacity)
                     }
                     
-                    // Start/Stop button with shadow and gradient
+                    // Start/Stop button with pale gradient
                     Button(action: {
                         if viewModel.isRunning {
                             viewModel.pauseTimer()
@@ -75,13 +72,12 @@ struct ProgressiveRingTimerView: View {
                             .frame(width: 32, height: 32)
                             .background(
                                 LinearGradient(
-                                    gradient: Gradient(colors: [viewModel.isCountingUp ? .red.opacity(0.8) : color.opacity(0.8), viewModel.isCountingUp ? .red : color]),
+                                    gradient: Gradient(colors: [viewModel.isCountingUp ? .orange.opacity(0.5) : color.opacity(0.5), viewModel.isCountingUp ? .orange.opacity(0.7) : color.opacity(0.7)]),
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
                                 )
                             )
                             .clipShape(Circle())
-                            .shadow(color: viewModel.isCountingUp ? .red.opacity(0.5) : color.opacity(0.5), radius: 5, x: 0, y: 4)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
@@ -104,14 +100,14 @@ struct ProgressiveRingTimerView: View {
 
 struct ProgressiveRingTimerView_Previews: PreviewProvider {
     static var previews: some View {
-        ProgressiveRingTimerView(viewModel: ProgressiveRingTimerViewModel(estimatedTime: 0.25), color: .blue)
+        ProgressiveRingTimerView(viewModel: ProgressiveRingTimerViewModel(estimatedTime: 0.25), color: .orange)
             .frame(width: 120, height: 120)
             .previewLayout(.sizeThatFits)
             .padding()
             .background(Color(.systemBackground))
             .environment(\.colorScheme, .light)
         
-        ProgressiveRingTimerView(viewModel: ProgressiveRingTimerViewModel(estimatedTime: 0.25), color: .blue)
+        ProgressiveRingTimerView(viewModel: ProgressiveRingTimerViewModel(estimatedTime: 0.25), color: .orange)
             .frame(width: 120, height: 120)
             .previewLayout(.sizeThatFits)
             .padding()

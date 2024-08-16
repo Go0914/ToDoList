@@ -19,20 +19,18 @@ struct NewItemView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                backgroundGradient
+                backgroundColor
                 
                 ScrollView {
-                    VStack(spacing: 24) {
+                    VStack(spacing: 20) {
                         titleField
                         dateSelectionView
                         estimatedTimePicker
                         saveButton
                     }
-                    .padding(.vertical, 24)
+                    .padding(.vertical, 20)
                 }
             }
-            .navigationTitle("New Task")
-            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: { dismiss() }) {
@@ -48,13 +46,9 @@ struct NewItemView: View {
         }
     }
     
-    private var backgroundGradient: some View {
-        LinearGradient(gradient: Gradient(colors: [
-            Color.blue.opacity(0.1),
-            Color.purple.opacity(0.05),
-            Color.teal.opacity(0.1)
-        ]), startPoint: .topLeading, endPoint: .bottomTrailing)
-        .ignoresSafeArea()
+    private var backgroundColor: some View {
+        Color(red: 1.0, green: 0.99, blue: 0.95) // さらに薄い黄色に調整
+            .ignoresSafeArea()
     }
     
     private var titleField: some View {
@@ -66,16 +60,13 @@ struct NewItemView: View {
             TextField("Enter task title", text: $viewModel.title)
                 .padding()
                 .background(
-                    LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.15), Color.purple.opacity(0.15)]),
-                                   startPoint: .topLeading,
-                                   endPoint: .bottomTrailing)
+                    Color.white
+                        .cornerRadius(12)
                 )
-                .cornerRadius(12)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(isTitleFocused ? Color.blue : Color(.systemGray4), lineWidth: 2)
+                        .stroke(isTitleFocused ? Color.teal.opacity(0.7) : Color(.systemGray4), lineWidth: 2)
                 )
-                .shadow(color: Color.blue.opacity(isTitleFocused ? 0.3 : 0.05), radius: 10, x: 0, y: 5)
                 .focused($isTitleFocused)
             
             Text("Task title is required")
@@ -86,7 +77,7 @@ struct NewItemView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(colorScheme == .dark ? Color(.systemGray5) : .white)
+                .fill(Color.white)
         )
         .padding(.horizontal)
     }
@@ -98,7 +89,7 @@ struct NewItemView: View {
                 .foregroundColor(.primary)
             
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
+                HStack(spacing: 10) {
                     ForEach(0..<quickSelectTitles.count, id: \.self) { index in
                         QuickSelectButton(title: quickSelectTitles[index],
                                           date: quickSelectDates[index],
@@ -128,10 +119,10 @@ struct NewItemView: View {
                     Text(showCustomPicker ? "Hide Calendar" : "Custom Date")
                 }
                 .font(.subheadline.weight(.medium))
-                .foregroundColor(.teal)
+                .foregroundColor(.orange)
                 .padding(.vertical, 10)
                 .padding(.horizontal, 14)
-                .background(Color.teal.opacity(0.1))
+                .background(Color.orange.opacity(0.2))
                 .cornerRadius(10)
             }
             
@@ -139,9 +130,12 @@ struct NewItemView: View {
                 DatePicker("Select Date", selection: $viewModel.dueDate, in: Date()..., displayedComponents: .date)
                     .datePickerStyle(GraphicalDatePickerStyle())
                     .padding()
-                    .background(colorScheme == .dark ? Color(.systemGray6) : .white)
+                    .background(Color.white)
                     .cornerRadius(12)
-                    .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.teal, lineWidth: 1)
+                    )
                     .transition(.scale.combined(with: .opacity))
             }
             
@@ -152,14 +146,11 @@ struct NewItemView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(colorScheme == .dark ? Color(.systemGray5) : .white)
-                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+                .fill(Color.white)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.blue, lineWidth: 1)
+                        .stroke(Color.teal.opacity(0.7), lineWidth: 1)
                 )
-
-            
         )
         .padding(.horizontal)
     }
@@ -170,7 +161,7 @@ struct NewItemView: View {
                 .font(.headline)
                 .foregroundColor(.primary)
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                 ForEach(0..<estimatedTimes.count, id: \.self) { index in
                     Button(action: {
                         withAnimation(.spring()) {
@@ -179,14 +170,14 @@ struct NewItemView: View {
                     }) {
                         Text(estimatedTimes[index])
                             .font(.subheadline.weight(.medium))
-                            .padding(.vertical, 10)
+                            .padding(.vertical, 8)
                             .frame(maxWidth: .infinity)
-                            .background(viewModel.estimatedTimeIndex == index ? Color.orange : (colorScheme == .dark ? Color(.systemGray6) : .white))
+                            .background(viewModel.estimatedTimeIndex == index ? Color.teal.opacity(0.9) : Color.white)
                             .foregroundColor(viewModel.estimatedTimeIndex == index ? .white : .primary)
                             .cornerRadius(10)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.orange, lineWidth: viewModel.estimatedTimeIndex == index ? 0 : 1)
+                                    .stroke(viewModel.estimatedTimeIndex == index ? Color.teal : Color.teal.opacity(0.7), lineWidth: 1)
                             )
                     }
                 }
@@ -195,10 +186,10 @@ struct NewItemView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(colorScheme == .dark ? Color(.systemGray5) : .white)
+                .fill(Color.white)
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.orange, lineWidth: 1)
+                        .stroke(Color.teal.opacity(0.7), lineWidth: 1)
                 )
         )
         .padding(.horizontal)
@@ -226,15 +217,10 @@ struct NewItemView: View {
                 .padding(.vertical, 16)
                 .background(
                     viewModel.canSave ?
-                    LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple.opacity(0.8)]),
-                                   startPoint: .leading,
-                                   endPoint: .trailing) :
-                    LinearGradient(gradient: Gradient(colors: [Color.gray.opacity(0.5), Color.gray.opacity(0.3)]),
-                                   startPoint: .leading,
-                                   endPoint: .trailing)
+                    Color.teal :
+                    Color.gray.opacity(0.5)
                 )
                 .cornerRadius(16)
-                .shadow(color: viewModel.canSave ? Color.blue.opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
         }
         .padding(.horizontal)
         .scaleEffect(animationAmount)
@@ -275,25 +261,24 @@ struct QuickSelectButton: View {
                     .font(.caption2)
                     .opacity(0.7)
             }
-            .padding(.vertical, 10)
-            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
             .background(
                 ZStack {
                     if isSelected {
-                        Color.blue
+                        Color.teal.opacity(0.9)
                             .matchedGeometryEffect(id: "background_\(title)", in: namespace)
                     } else {
-                        colorScheme == .dark ? Color(.systemGray6) : .white
+                        Color.white
                     }
                 }
             )
             .foregroundColor(isSelected ? .white : .primary)
-            .cornerRadius(12)
+            .cornerRadius(10)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.blue, lineWidth: isSelected ? 0 : 1)
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(isSelected ? Color.teal : Color.teal.opacity(0.7), lineWidth: 1)
             )
-            .shadow(color: Color.black.opacity(isSelected ? 0.1 : 0), radius: 5, x: 0, y: 2)
         }
         .animation(.spring(), value: isSelected)
     }

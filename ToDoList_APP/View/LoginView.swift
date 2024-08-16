@@ -6,24 +6,24 @@ struct LoginView: View {
     
     var body: some View {
         ZStack {
-            // Background gradient
-            LinearGradient(gradient: Gradient(colors: [Color.purple.opacity(0.6), Color.blue.opacity(0.6)]),
+            // Background with soft gradient
+            LinearGradient(gradient: Gradient(colors: [Color.orange.opacity(0.4), Color.pink.opacity(0.4)]),
                            startPoint: .topLeading,
                            endPoint: .bottomTrailing)
                 .ignoresSafeArea()
             
             VStack(spacing: 20) {
-                // Logo
+                // Logo with softer colors
                 Image(systemName: "checkmark.circle.fill")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 100, height: 100)
-                    .foregroundColor(.white)
+                    .foregroundColor(.white.opacity(0.8))
                     .shadow(radius: 10)
                 
                 Text("To Do List")
                     .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(.white.opacity(0.9))
                     .shadow(radius: 5)
                 
                 // Login Form
@@ -57,9 +57,9 @@ struct LoginView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.blue)
+                        .background(Color.orange.opacity(0.7))
                         .cornerRadius(10)
-                        .shadow(radius: 5)
+                        .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 3)
                     }
                     .disabled(isLoading)
                 }
